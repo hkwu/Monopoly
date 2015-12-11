@@ -1,0 +1,166 @@
+{
+    "style": "Monopoly (US Standard Edition 2008)",
+    "size": 40,
+    "tiles": [
+        {
+            "index": 0,
+            "name": "Collect $200 salary as you pass GO"
+        },
+        {
+            "index": 1,
+            "name": "Mediterranean Avenue"
+        },
+        {
+            "index": 2,
+            "name": "Community Chest"
+        },
+        {
+            "index": 3,
+            "name": "Baltic Avenue"
+        },
+        {
+            "index": 4,
+            "name": "Income Tax (pay $200)"
+        },
+        {
+            "index": 5,
+            "name": "Reading Railroad"
+        },
+        {
+            "index": 6,
+            "name": "Oriental Avenue"
+        },
+        {
+            "index": 7,
+            "name": "Chance"
+        },
+        {
+            "index": 8,
+            "name": "Vermont Avenue"
+        },
+        {
+            "index": 9,
+            "name": "Connecticut Avenue"
+        },
+        {
+            "index": 10,
+            "name": "In Jail/Just Visiting"
+        },
+        {
+            "index": 11,
+            "name": "St. Charles Place"
+        },
+        {
+            "index": 12,
+            "name": "Electric Company"
+        },
+        {
+            "index": 13,
+            "name": "States Avenue"
+        },
+        {
+            "index": 14,
+            "name": "Virginia Avenue"
+        },
+        {
+            "index": 15,
+            "name": "Pennsylvania Railroad"
+        },
+        {
+            "index": 16,
+            "name": "St. James Place"
+        },
+        {
+            "index": 17,
+            "name": "Community Chest"
+        },
+        {
+            "index": 18,
+            "name": "Tennessee Avenue"
+        },
+        {
+            "index": 19,
+            "name": "New York Avenue"
+        },
+        {
+            "index": 20,
+            "name": "Free Parking"
+        },
+        {
+            "index": 21,
+            "name": "Kentucky Avenue"
+        },
+        {
+            "index": 22,
+            "name": "Chance"
+        },
+        {
+            "index": 23,
+            "name": "Indiana Avenue"
+        },
+        {
+            "index": 24,
+            "name": "Illinois Avenue"
+        },
+        {
+            "index": 25,
+            "name": "B&O Railroad"
+        },
+        {
+            "index": 26,
+            "name": "Atlantic Avenue"
+        },
+        {
+            "index": 27,
+            "name": "Ventnor Avenue"
+        },
+        {
+            "index": 28,
+            "name": "Water Works"
+        },
+        {
+            "index": 29,
+            "name": "Marvin Gardens"
+        },
+        {
+            "index": 30,
+            "name": "Go To Jail"
+        },
+        {
+            "index": 31,
+            "name": "Pacific Avenue"
+        },
+        {
+            "index": 32,
+            "name": "North Carolina Avenue"
+        },
+        {
+            "index": 33,
+            "name": "Community Chest"
+        },
+        {
+            "index": 34,
+            "name": "Pennsylvania Avenue"
+        },
+        {
+            "index": 35,
+            "name": "Short Line"
+        },
+        {
+            "index": 36,
+            "name": "Chance"
+        },
+        {
+            "index": 37,
+            "name": "Park Place"
+        },
+        {
+            "index": 38,
+            "name": "Luxury Tax (pay $100)"
+        },
+        {
+            "index": 39,
+            "name": "Boardwalk"
+        }
+    ]
+}
