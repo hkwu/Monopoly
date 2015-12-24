@@ -11,7 +11,7 @@ class Command(object):
     """Handles the execution of game commands. Performs basic verification of
     command prerequisites."""
     def __init__(self, controller):
-        self._controller = controller
+        self.controller = controller
 
     def execute(self, player):
         """Execute the command."""
@@ -26,35 +26,35 @@ class Move(Command):
     """Handles a request to move a player piece."""
     def __init__(self, controller):
         super().__init__(controller)
-        self._rollCount = 0
-        self._rollAgain = True
+        self.rollCount = 0
+        self.rollAgain = True
 
     def execute(self, player):
-        if not self._rollAgain:
-            self._controller.view.notifyOutOfMoves(player)
+        if not self.rollAgain:
+            self.controller.relayOutOfMoves(player)
             return
 
-        self._controller.board.dice.roll()
+        self.controller.board.dice.roll()
 
         # if self._controller.board.dice.isDouble() and self._rollCount == 2:
         #     self._controller.board.acceptNotification(CNJailPlayer(player))
         #     self._controller.view.notifyPlayerJailed(player)
 
-        delta = self._controller.board.dice.sum()
-        self._controller.board.acceptNotification(notification.CNPlayerMove(player, delta))
-        print("sum is {}, doubles is {}".format(delta, self._controller.board.dice.isDouble()))
+        delta = self.controller.board.dice.sum()
+        self.controller.board.acceptNotification(notification.CNPlayerMove(player, delta))
+        print("sum is {}, doubles is {}".format(delta, self.controller.board.dice.isDouble()))
 
-        if self._controller.board.dice.isDouble():
-            self._rollCount += 1
-            if self._rollCount == 2:
-                self._rollAgain = False
+        if self.controller.board.dice.isDouble():
+            self.rollCount += 1
+            if self.rollCount == 2:
+                self.rollAgain = False
         else:
-            self._rollAgain = False
+            self.rollAgain = False
 
 
     def reset(self):
-        self._rollCount = 0
-        self._rollAgain = True
+        self.rollCount = 0
+        self.rollAgain = True
 
 
 class Purchase(Command):
@@ -64,7 +64,7 @@ class Purchase(Command):
         super().__init__(controller)
 
     def execute(self, player):
-        self._controller.board.acceptNotification(notification.CNPlayerPurchase(player))
+        self.controller.board.acceptNotification(notification.CNPlayerPurchase(player))
 
     def reset(self):
         pass
@@ -92,6 +92,10 @@ class Controller(object):
     def acceptNotification(self, notification):
         """Accepts notification from the Board."""
         notification.visitCT(self)
+
+    def relayOutOfMoves(self, player):
+        """Notify view that a player cannot move again."""
+        self._view.notifyOutOfMoves(player)
 
     def relayBuyOpp(self, tile, player):
         """Notify view that player should be prompted for a purchase action
@@ -123,7 +127,7 @@ class Controller(object):
         """Notify view that a player has changed positions."""
         self._view.notifyPlayerMove(player, tile)
 
-    def notifyAddPlayer(self, name, piece):
+    def playerAdd(self, name, piece):
         """Adds a player to the game."""
         self._board.playerAdd(name, piece)
 

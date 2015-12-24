@@ -56,9 +56,7 @@ class Player(object):
 
     def purchase(self, tile):
         """Purchases the tile given."""
-        if tile.owner and tile.owner.name == self._name:
-            self._board.acceptNotification(notification.PNAlreadyOwned(self, tile))
-        elif tile.value <= self._cash:
+        if tile.value <= self._cash:
             self._cash -= tile.value
             tile.owner = self
             self._board.acceptNotification(notification.PNTilePurchase(self, tile))

@@ -15,5 +15,4 @@ if __name__ == '__main__':
     gameView = textview.TextView()
     gameController = controller.Controller(gameBoard, gameView)
     gameView.register(gameController)
-    gameView.initialize()
     gameView.play()
