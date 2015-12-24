@@ -16,8 +16,6 @@ class MonopolyDataParser(abc.ABC):
         with open(dataFile) as data:
             self._file = json.load(data)
 
-        self.parse()
-
     @abc.abstractmethod
     def parse(self):
         """Parses the file given to this object and stores the data
@@ -28,14 +26,13 @@ class MonopolyDataParser(abc.ABC):
 class MonopolyInitParser(MonopolyDataParser):
     """Parses JSON file that contains tile initialization data."""
     def __init__(self, board, dataFile):
-        super().__init__(self, board, dataFile)
+        super().__init__(board, dataFile)
         self.tiles = []
 
     def parse(self):
         self.gameStyle = self._file['style']
-        self.boardSize = self._file['size']
-        fTiles = self._file['tiles']
+        self.startingCash = self._file['currency']['defaultAmount']
 
-        for i in fTiles:
+        for i in self._file['tiles']:
             self.tiles.append(tile.TileFactory.makeTile(self._board, i['name'], 
                                                         i['type'], i['data']))

@@ -6,5 +6,14 @@
 # Kelvin Wu
 ############
 
+import board
+import controller
+import textview
+
 if __name__ == '__main__':
-    pass
+    gameBoard = board.Board('standard.json')
+    gameView = textview.TextView()
+    gameController = controller.Controller(gameBoard, gameView)
+    gameView.register(gameController)
+    gameView.initialize()
+    gameView.play()

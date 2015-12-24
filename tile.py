@@ -21,9 +21,13 @@ class TileFactory(object):
 class Tile(abc.ABC):
     """Abstract tile class at head of hierarchy."""
     def __init__(self, name, board):
-        super().__init__(self)
-        self.name = name
+        super().__init__()
+        self._name = name
         self._board = board
+
+    @property
+    def name(self):
+        return self._name
 
     @abc.abstractmethod
     def action(self, player):
@@ -52,11 +56,23 @@ class OwnableTile(Tile):
         self._value = value
         self._owner = owner
 
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def owner(self):
+        return self._owner
+    
+    @owner.setter
+    def owner(self, owner):
+        self._owner = owner
+    
     def action(self, player):
-        if _owner:
+        if self._owner:
             self.charge(player)
         else:
-            self.pushNotification(notification.TNBuyOpp(self, player))
+            self.pushNotification(notification.TNBuyOpp(player, self))
 
     @abc.abstractmethod
     def charge(self, player):
@@ -76,8 +92,7 @@ class Property(OwnableTile):
         return self._rent[self._improvementLevel]
 
     def charge(self, player):
-        self._owner.cash += self.rent
-        player.cash -= self.rent
+        player.payRent(self._owner, self._value)
 
 
 # TODO

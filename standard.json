@@ -1,6 +1,10 @@
 {
     "style": "Monopoly (US Standard Edition 2008)",
-    "size": 40,
+    "currency": {
+        "name": "US Dollars",
+        "symbol": "$",
+        "defaultAmount": 1500
+    },
     "tiles": [
         {
             "index": 0,
@@ -293,7 +297,8 @@
         {
             "index": 36,
             "type": "basic",
-            "name": "Chance"
+            "name": "Chance",
+            "data": null
         },
         {
             "index": 37,
