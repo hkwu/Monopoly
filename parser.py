@@ -30,8 +30,8 @@ class MonopolyInitParser(MonopolyDataParser):
         self.tiles = []
 
     def parse(self):
-        self.gameStyle = self._file['style']
-        self.startingCash = self._file['currency']['defaultAmount']
+        self.style = self._file['style']
+        self.currency = self._file['currency']
 
         for i in self._file['tiles']:
             self.tiles.append(tile.TileFactory.makeTile(self._board, i['name'], 

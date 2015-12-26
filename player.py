@@ -58,11 +58,12 @@ class Player(object):
 
     def move(self, delta):
         """Moves player delta tiles from current position."""
+        newPos = (self._pos + delta) % self._board.size
         # check for Pass GO condition
-        if (self._pos + delta) % self._board.boardSize < self._pos:
+        if delta > 0 and newPos < self._pos:
             self._board.acceptNotification(notification.PNPassGo(self))
-
-        self._pos = (self._pos + delta) % self._board.boardSize
+            
+        self._pos = newPos
 
     def payRent(self, player, amount):
         """Pays the required rent to the other player. Sends a notification 

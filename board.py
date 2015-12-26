@@ -16,18 +16,26 @@ class Board(object):
     def __init__(self, dataFile):
         dataObject = parser.MonopolyInitParser(self, dataFile)
         dataObject.parse()
-        self._gameStyle = dataObject.gameStyle
-        self._boardSize = 40
-        self._startingCash = dataObject.startingCash
-        self._tiles = dataObject.tiles
-
-        self._dice = dice.Dice()
         self._subscriber = None
+        self._size = 40
+        self._style = dataObject.style
+        self._currency = dataObject.currency
+        self._tiles = dataObject.tiles
+        self._dice = dice.Dice()
         self._players = []
 
     @property
-    def boardSize(self):
-        return self._boardSize
+    def size(self):
+        return self._size
+
+    @property
+    def style(self):
+        return self._style
+
+    @property
+    def currency(self):
+        # return a copy so Board's data isn't tampered with
+        return self._currency.copy()
 
     def diceA(self):
         """Gets the value of the first die."""
@@ -62,7 +70,7 @@ class Board(object):
     def playerAdd(self, name, piece, pos=0, cash=None):
         """Adds a player to the game."""
         if cash == None:
-            self._players.append(player.Player(name, piece, pos, self, self._startingCash))
+            self._players.append(player.Player(name, piece, pos, self, self._currency['defaultAmount']))
         else:
             self._players.append(player.Player(name, piece, pos, self, cash))
 

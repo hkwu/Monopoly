@@ -78,8 +78,6 @@ class Controller(object):
     def __init__(self, board, view):
         self._board = board
         self._view = view
-        self._board.register(self)
-
         self._viewNotifications = {
             'OUT_OF_MOVES': self._view.notifyOutOfMoves,
             'DICE_ROLL': self._view.notifyDiceRoll,
@@ -90,11 +88,12 @@ class Controller(object):
             'LIQUIDATE': self._view.notifyLiquidate,
             'PLAYER_MOVE': self._view.notifyPlayerMove
         }
-
         self._commands = {
             'roll': Move(self),
             'purchase': Purchase(self)
         }
+
+        self._board.register(self)
 
     @property
     def board(self):
@@ -112,6 +111,14 @@ class Controller(object):
         """Sends a notification package to the view. Takes in code that identifies
         what kind of notification is being sent."""
         self._viewNotifications[code](data)
+
+    def queryStyle(self):
+        """Returns the style of the game board."""
+        return self._board.style
+
+    def queryCurrency(self):
+        """Returns currency data for the current game."""
+        return self._board.currency
 
     def playerAdd(self, name, piece):
         """Adds a player to the game."""

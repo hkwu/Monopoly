@@ -90,12 +90,11 @@ class InputHandler(cmd.Cmd):
 class TextView(object):
     """Basic text view."""
     def __init__(self):
-        self._style = ''
-        self._players = []
-        self._numPlayers = 0
         self._controller = None
         self._inputHandler = InputHandler(self)
-
+        self._players = []
+        self._numPlayers = 0
+        
     @property
     def style(self):
         return self._style
@@ -123,6 +122,8 @@ class TextView(object):
     def register(self, controller):
         """Registers the controller with the view."""
         self._controller = controller
+        self._style = self._controller.queryStyle()
+        self._currency = self._controller.queryCurrency()
 
     def notifyDiceRoll(self, data):
         print("Rolled: ({}, {})".format(data['diceA'], data['diceB']))
@@ -146,19 +147,22 @@ class TextView(object):
             print("Auction (unimplemented).")
 
     def notifyPassGo(self, data):
-        print("{} has passed GO! Collected $200.".format(data['player']['name']))
+        print("{} has passed GO! Collected {}200.".format(data['player']['name'],
+                                                          self._currency['symbol']))
 
     def notifyTilePurchase(self, data):
         print("{} has purchased {}. Congratulations!".format(data['player']['name'], 
                                                              data['tile']['name']))
 
     def notifyInsufficientFunds(self, data):
-        print("{} has insufficient funds to do this. Short: {}.".format(data['player']['name'], 
-                                                                        data['deficit']))
+        print("{} has insufficient funds to do this. Short: {}{}.".format(self._currency['symbol'],
+                                                                          data['player']['name'], 
+                                                                          data['deficit']))
 
     def notifyLiquidate(self, data):
-        print("{} must sell assets until they obtain {}.".format(data['player']['name'], 
-                                                                 data['required']))
+        print("{} must sell assets until they obtain {}{}.".format(self._currency['symbol'],
+                                                                   data['player']['name'], 
+                                                                   data['required']))
 
     def notifyPlayerMove(self, data):
         print("{} has moved to {}.".format(data['player']['name'], data['tile']['name']))
