@@ -25,6 +25,9 @@ class BoardRelayNotification(Notification):
     def visitBD(self, other):
         other.relayNotification(self)
 
+    def visitCT(self, other):
+        other.notifyView(self.id, self.data)
+
 
 class ControllerBoardNotification(Notification):
     """A notification sent from the controller to the Board."""
@@ -37,65 +40,57 @@ class BoardControllerNotification(Notification):
     def visitBD(self, other):
         pass
 
+    def visitCT(self, other):
+        other.notifyView(self.id, self.data)
 
 class TNBuyOpp(BoardRelayNotification):
     """Notification that a player has landed on a purchasable tile."""
     def __init__(self, player, tile):
+        self.id = 'BUY_OPP'
         self.data = {
             'player': player.pack(),
             'tile': tile.pack()
         }
-
-    def visitCT(self, other):
-        other.relayBuyOpp(self.data)
 
 
 class PNPassGo(BoardRelayNotification):
     """Notification that a player has passed GO."""
     def __init__(self, player):
+        self.id = 'PASS_GO'
         self.data = {
             'player': player.pack()
         }
-
-    def visitCT(self, other):
-        other.relayPassGo(self.data)
 
 
 class PNTilePurchase(BoardRelayNotification):
     """Notification that a player has purchased a tile."""
     def __init__(self, player, tile):
+        self.id = 'TILE_PURCHASE'
         self.data = {
             'player': player.pack(),
             'tile': tile.pack()
         }
-
-    def visitCT(self, other):
-        other.relayTilePurchase(self.data)
 
 
 class PNInsufficientFunds(BoardRelayNotification):
     """Notification that a player has insufficient funds to complete the
     current action."""
     def __init__(self, player, deficit):
+        self.id = 'INSUFFICIENT_FUNDS'
         self.data = {
             'player': player.pack(),
             'deficit': deficit
         }
 
-    def visitCT(self, other):
-        other.relayInsufficientFunds(self.data)
-
 
 class PNLiquidate(BoardRelayNotification):
     """Notification that a player must begin liquidating their assets."""
     def __init__(self, player, required):
+        self.id = 'LIQUIDATE'
         self.data = {
             'player': player.pack(),
             'required': required
         }
-
-    def visitCT(self, other):
-        other.relayLiquidate(self.data)
 
 
 class CNPlayerMove(ControllerBoardNotification):
@@ -120,10 +115,8 @@ class CNPlayerPurchase(ControllerBoardNotification):
 class BNPlayerMove(BoardControllerNotification):
     """Notification that player has made a move to a tile."""
     def __init__(self, player, tile):
+        self.id = 'PLAYER_MOVE'
         self.data = {
             'player': player.pack(),
             'tile': tile.pack()
         }
-
-    def visitCT(self, other):
-        other.relayPlayerMove(self.data)

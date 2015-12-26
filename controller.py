@@ -31,7 +31,7 @@ class Move(Command):
 
     def execute(self, player):
         if not self.rollAgain:
-            self.controller.relayOutOfMoves(player)
+            self.controller.notifyView('OUT_OF_MOVES', {'player': {'name': player}})
             return
 
         self.controller.board.diceRoll()
@@ -45,9 +45,14 @@ class Move(Command):
         else:
             self.rollAgain = False
 
-        self.controller.relayDiceRoll(self.controller.board.diceA(), 
-                                      self.controller.board.diceB(), 
-                                      isDouble, self.rollAgain)
+        data = {
+            'diceA': self.controller.board.diceA(),
+            'diceB': self.controller.board.diceB(),
+            'isDouble': isDouble,
+            'rollAgain': self.rollAgain
+        }
+
+        self.controller.notifyView('DICE_ROLL', data)
         self.controller.board.acceptNotification(notification.CNPlayerMove(player, delta))
 
 
@@ -75,6 +80,17 @@ class Controller(object):
         self._view = view
         self._board.register(self)
 
+        self._viewNotifications = {
+            'OUT_OF_MOVES': self._view.notifyOutOfMoves,
+            'DICE_ROLL': self._view.notifyDiceRoll,
+            'BUY_OPP': self._view.notifyBuyOpp,
+            'PASS_GO': self._view.notifyPassGo,
+            'TILE_PURCHASE': self._view.notifyTilePurchase,
+            'INSUFFICIENT_FUNDS': self._view.notifyInsufficientFunds,
+            'LIQUIDATE': self._view.notifyLiquidate,
+            'PLAYER_MOVE': self._view.notifyPlayerMove
+        }
+
         self._commands = {
             'roll': Move(self),
             'purchase': Purchase(self)
@@ -92,46 +108,10 @@ class Controller(object):
         """Accepts notification from the Board."""
         notification.visitCT(self)
 
-    def relayDiceRoll(self, diceA, diceB, isDouble, rollAgain):
-        """Notify view of the results of a dice roll."""
-        data = {
-            'diceA': diceA,
-            'diceB': diceB,
-            'isDouble': isDouble,
-            'rollAgain': rollAgain
-        }
-
-        self._view.notifyDiceRoll(data)
-
-    def relayOutOfMoves(self, player):
-        """Notify view that a player cannot move again."""
-        self._view.notifyOutOfMoves(player)
-
-    def relayBuyOpp(self, data):
-        """Notify view that player should be prompted for a purchase action
-        on tile."""
-        self._view.notifyBuyOpp(data)
-
-    def relayPassGo(self, data):
-        """Notify view that player has passed GO."""
-        self._view.notifyPassGo(data)
-
-    def relayTilePurchase(self, data):
-        """Notify view that player has successfully purchased tile."""
-        self._view.notifyTilePurchase(data)
-
-    def relayInsufficientFunds(self, data):
-        """Notify view that player has insufficient funds to complete an action."""
-        self._view.notifyInsufficientFunds(data)
-
-    def relayLiquidate(self, data):
-        """Notify view that player must liquidate assets until required cash
-        is obtained."""
-        self._view.notifyLiquidate(data)
-
-    def relayPlayerMove(self, data):
-        """Notify view that a player has changed positions."""
-        self._view.notifyPlayerMove(data)
+    def notifyView(self, code, data):
+        """Sends a notification package to the view. Takes in code that identifies
+        what kind of notification is being sent."""
+        self._viewNotifications[code](data)
 
     def playerAdd(self, name, piece):
         """Adds a player to the game."""

@@ -135,8 +135,8 @@ class TextView(object):
 
             print(msg)
 
-    def notifyOutOfMoves(self, player):
-        print("{}, you cannot roll anymore.".format(player))
+    def notifyOutOfMoves(self, data):
+        print("{}, you cannot roll anymore.".format(data['player']['name']))
 
     def notifyBuyOpp(self, data):
         print("This property is unowned! Purchase it?")
