@@ -37,6 +37,25 @@ class Player(object):
     def cash(self, val):
         self._cash = val
 
+    @property
+    def properties(self):
+        return self._properties
+
+    def pack(self):
+        """Returns a dictionary containing the state information of the player."""
+        data = {
+            'name': self._name,
+            'piece': self._piece,
+            'pos': self._pos,
+            'cash': self._cash,
+            'properties': []
+        }
+
+        for i in self._properties:
+            data['properties'].append({'name': i.name, 'value': i.value})
+
+        return data
+
     def move(self, delta):
         """Moves player delta tiles from current position."""
         # check for Pass GO condition

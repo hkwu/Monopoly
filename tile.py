@@ -29,6 +29,10 @@ class Tile(abc.ABC):
     def name(self):
         return self._name
 
+    def pack(self):
+        """Returns a dictionary containing the state information of the tile."""
+        return {'name': self._name}
+
     @abc.abstractmethod
     def action(self, player):
         """Called when the player lands on this tile."""
@@ -52,9 +56,13 @@ class OwnableTile(Tile):
     """Represents a tile that can be owned by a player."""
     def __init__(self, name, board, value, owner=None, isOwned=False):
         super().__init__(name, board)
-        self.isOwned = isOwned
+        self._isOwned = isOwned
         self._value = value
         self._owner = owner
+
+    @property
+    def isOwned(self):
+        return self._isOwned
 
     @property
     def value(self):
@@ -67,6 +75,13 @@ class OwnableTile(Tile):
     @owner.setter
     def owner(self, owner):
         self._owner = owner
+
+    def pack(self):
+        data = super().pack()
+        data['isOwned'] = self._isOwned
+        data['value'] = self._value
+        data['owned'] = self._owner.name if self._owner else 'unowned'
+        return data
     
     def action(self, player):
         if self._owner:
@@ -90,6 +105,12 @@ class Property(OwnableTile):
     @property
     def rent(self):
         return self._rent[self._improvementLevel]
+
+    def pack(self):
+        data = super().pack()
+        data['rent'] = self.rent
+        data['improvementLevel'] = self._improvementLevel
+        return data
 
     def charge(self, player):
         player.payRent(self._owner, self._value)

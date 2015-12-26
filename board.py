@@ -29,9 +29,22 @@ class Board(object):
     def boardSize(self):
         return self._boardSize
 
-    @property
-    def dice(self):
-        return self._dice
+    def diceA(self):
+        """Gets the value of the first die."""
+        return self._dice.a
+
+    def diceB(self):
+        """Gets the value of the second die."""
+        return self._dice.b
+
+    def diceRoll(self):
+        self._dice.roll()
+
+    def diceSum(self):
+        return self._dice.sum()
+
+    def diceIsDouble(self):
+        return self._dice.isDouble()
 
     def register(self, observer):
         """Registers a subscriber with the board. Replaces existing subscriber."""

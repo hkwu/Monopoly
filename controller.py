@@ -34,22 +34,21 @@ class Move(Command):
             self.controller.relayOutOfMoves(player)
             return
 
-        self.controller.board.dice.roll()
+        self.controller.board.diceRoll()
+        delta = self.controller.board.diceSum()
+        isDouble = self.controller.board.diceIsDouble()
 
-        # if self._controller.board.dice.isDouble() and self._rollCount == 2:
-        #     self._controller.board.acceptNotification(CNJailPlayer(player))
-        #     self._controller.view.notifyPlayerJailed(player)
-
-        delta = self.controller.board.dice.sum()
-        self.controller.board.acceptNotification(notification.CNPlayerMove(player, delta))
-        print("sum is {}, doubles is {}".format(delta, self.controller.board.dice.isDouble()))
-
-        if self.controller.board.dice.isDouble():
+        if isDouble:
             self.rollCount += 1
             if self.rollCount == 2:
                 self.rollAgain = False
         else:
             self.rollAgain = False
+
+        self.controller.relayDiceRoll(self.controller.board.diceA(), 
+                                      self.controller.board.diceB(), 
+                                      isDouble, self.rollAgain)
+        self.controller.board.acceptNotification(notification.CNPlayerMove(player, delta))
 
 
     def reset(self):
@@ -93,39 +92,46 @@ class Controller(object):
         """Accepts notification from the Board."""
         notification.visitCT(self)
 
+    def relayDiceRoll(self, diceA, diceB, isDouble, rollAgain):
+        """Notify view of the results of a dice roll."""
+        data = {
+            'diceA': diceA,
+            'diceB': diceB,
+            'isDouble': isDouble,
+            'rollAgain': rollAgain
+        }
+
+        self._view.notifyDiceRoll(data)
+
     def relayOutOfMoves(self, player):
         """Notify view that a player cannot move again."""
         self._view.notifyOutOfMoves(player)
 
-    def relayBuyOpp(self, tile, player):
+    def relayBuyOpp(self, data):
         """Notify view that player should be prompted for a purchase action
         on tile."""
-        self._view.notifyBuyOpp(tile, player)
+        self._view.notifyBuyOpp(data)
 
-    def relayPassGo(self, player):
+    def relayPassGo(self, data):
         """Notify view that player has passed GO."""
-        self._view.notifyPassGo(player)
+        self._view.notifyPassGo(data)
 
-    def relayTilePurchase(self, player, tile):
+    def relayTilePurchase(self, data):
         """Notify view that player has successfully purchased tile."""
-        self._view.notifyTilePurchase(player, tile)
+        self._view.notifyTilePurchase(data)
 
-    def relayInsufficientFunds(self, player, deficit):
+    def relayInsufficientFunds(self, data):
         """Notify view that player has insufficient funds to complete an action."""
-        self._view.notifyInsufficientFunds(player, deficit)
+        self._view.notifyInsufficientFunds(data)
 
-    def relayLiquidate(self, player, required):
+    def relayLiquidate(self, data):
         """Notify view that player must liquidate assets until required cash
         is obtained."""
-        self._view.notifyLiquidate(player, required)
+        self._view.notifyLiquidate(data)
 
-    def relayAlreadyOwned(self, player, tile):
-        """Notify view that a player is attempting to purchase an owned property."""
-        self._view.notifyAlreadyOwned(player, tile)
-
-    def relayPlayerMove(self, player, tile):
+    def relayPlayerMove(self, data):
         """Notify view that a player has changed positions."""
-        self._view.notifyPlayerMove(player, tile)
+        self._view.notifyPlayerMove(data)
 
     def playerAdd(self, name, piece):
         """Adds a player to the game."""

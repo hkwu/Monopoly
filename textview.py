@@ -124,33 +124,44 @@ class TextView(object):
         """Registers the controller with the view."""
         self._controller = controller
 
+    def notifyDiceRoll(self, data):
+        print("Rolled: ({}, {})".format(data['diceA'], data['diceB']))
+        if data['isDouble']:
+            msg = "Doubles rolled! "
+            if data['rollAgain']:
+                msg += "You can roll again."
+            else:
+                msg += "Careful! If you roll doubles again, you'll go to jail!"
+
+            print(msg)
+
     def notifyOutOfMoves(self, player):
         print("{}, you cannot roll anymore.".format(player))
 
-    def notifyBuyOpp(self, player, tile):
+    def notifyBuyOpp(self, data):
         print("This property is unowned! Purchase it?")
         if self._inputHandler.confirmAction():
-            self._controller.playerPurchase(player)
+            self._controller.playerPurchase(data['player']['name'])
         else:
             print("Auction (unimplemented).")
 
-    def notifyPassGo(self, player):
-        print("{} has passed GO! Collected $200.".format(player))
+    def notifyPassGo(self, data):
+        print("{} has passed GO! Collected $200.".format(data['player']['name']))
 
-    def notifyTilePurchase(self, player, tile):
-        print("{} has purchased {}. Congratulations!".format(player, tile))
+    def notifyTilePurchase(self, data):
+        print("{} has purchased {}. Congratulations!".format(data['player']['name'], 
+                                                             data['tile']['name']))
 
-    def notifyInsufficientFunds(self, player, deficit):
-        print("{} has insufficient funds to do this. Short: {}.".format(player, deficit))
+    def notifyInsufficientFunds(self, data):
+        print("{} has insufficient funds to do this. Short: {}.".format(data['player']['name'], 
+                                                                        data['deficit']))
 
-    def notifyLiquidate(self, player, required):
-        print("{} must sell assets until they obtain {}.".format(player, required))
+    def notifyLiquidate(self, data):
+        print("{} must sell assets until they obtain {}.".format(data['player']['name'], 
+                                                                 data['required']))
 
-    def notifyAlreadyOwned(self, player, tile):
-        print("{} has attempted to purchase {} again. Not possible!".format(player, tile))
-
-    def notifyPlayerMove(self, player, tile):
-        print("{} has moved to {}.".format(player, tile))
+    def notifyPlayerMove(self, data):
+        print("{} has moved to {}.".format(data['player']['name'], data['tile']['name']))
 
     def play(self):
         self._inputHandler.cmdloop()
