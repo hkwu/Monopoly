@@ -1,6 +1,6 @@
 #################
 # Monopoly/Engine
-# data_parser.py
+# parse.py
 # 2015-12-22
 # Kelvin Wu
 #################

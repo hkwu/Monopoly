@@ -7,14 +7,14 @@
 
 import dice
 import notification
-import data_parser
+import parse
 import player
 import tile
 
 class Board(object):
     """Handles state information for the board."""
     def __init__(self, dataFile):
-        dataObject = data_parser.MonopolyInitParser(self, dataFile)
+        dataObject = parse.MonopolyInitParser(self, dataFile)
         dataObject.parse()
         self._subscriber = None
         self._size = 40
