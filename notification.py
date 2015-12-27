@@ -7,6 +7,17 @@
 
 import abc
 
+# notification codes
+OUT_OF_MOVES = 'OUT_OF_MOVES'
+DICE_ROLL = 'DICE_ROLL'
+BUY_OPP = 'BUY_OPP'
+PASS_GO = 'PASS_GO'
+TILE_PURCHASE = 'TILE_PURCHASE'
+INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS'
+LIQUIDATE = 'LIQUIDATE'
+PLAYER_MOVE = 'PLAYER_MOVE'
+RENT_PAID = 'RENT_PAID'
+
 class Notification(abc.ABC):
     """Abstract notification class."""
     @abc.abstractmethod
@@ -46,7 +57,7 @@ class BoardControllerNotification(Notification):
 class TNBuyOpp(BoardRelayNotification):
     """Notification that a player has landed on a purchasable tile."""
     def __init__(self, player, tile):
-        self.id = 'BUY_OPP'
+        self.id = BUY_OPP
         self.data = {
             'player': player.pack(),
             'tile': tile.pack()
@@ -56,7 +67,7 @@ class TNBuyOpp(BoardRelayNotification):
 class PNPassGo(BoardRelayNotification):
     """Notification that a player has passed GO."""
     def __init__(self, player):
-        self.id = 'PASS_GO'
+        self.id = PASS_GO
         self.data = {
             'player': player.pack()
         }
@@ -65,7 +76,7 @@ class PNPassGo(BoardRelayNotification):
 class PNTilePurchase(BoardRelayNotification):
     """Notification that a player has purchased a tile."""
     def __init__(self, player, tile):
-        self.id = 'TILE_PURCHASE'
+        self.id = TILE_PURCHASE
         self.data = {
             'player': player.pack(),
             'tile': tile.pack()
@@ -76,7 +87,7 @@ class PNInsufficientFunds(BoardRelayNotification):
     """Notification that a player has insufficient funds to complete the
     current action."""
     def __init__(self, player, deficit):
-        self.id = 'INSUFFICIENT_FUNDS'
+        self.id = INSUFFICIENT_FUNDS
         self.data = {
             'player': player.pack(),
             'deficit': deficit
@@ -86,10 +97,21 @@ class PNInsufficientFunds(BoardRelayNotification):
 class PNLiquidate(BoardRelayNotification):
     """Notification that a player must begin liquidating their assets."""
     def __init__(self, player, required):
-        self.id = 'LIQUIDATE'
+        self.id = LIQUIDATE
         self.data = {
             'player': player.pack(),
             'required': required
+        }
+
+
+class PNRentPaid(BoardRelayNotification):
+    """Notification that a player has paid rent."""
+    def __init__(self, playerRenter, playerLandlord, rent):
+        self.id = RENT_PAID
+        self.data = {
+            'playerRenter': playerRenter.pack(),
+            'playerLandlord': playerLandlord.pack(),
+            'rent': rent
         }
 
 
@@ -115,7 +137,7 @@ class CNPlayerPurchase(ControllerBoardNotification):
 class BNPlayerMove(BoardControllerNotification):
     """Notification that player has made a move to a tile."""
     def __init__(self, player, tile):
-        self.id = 'PLAYER_MOVE'
+        self.id = PLAYER_MOVE
         self.data = {
             'player': player.pack(),
             'tile': tile.pack()

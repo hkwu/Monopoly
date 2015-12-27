@@ -167,5 +167,10 @@ class TextView(object):
     def notifyPlayerMove(self, data):
         print("{} has moved to {}.".format(data['player']['name'], data['tile']['name']))
 
+    def notifyRentPaid(self, data):
+        print("{} has paid {}{} to {}.".format(data['playerRenter']['name'],
+                                               self._currency['symbol'], data['rent'],
+                                               data['playerLandlord']['name']))
+
     def play(self):
         self._inputHandler.cmdloop()

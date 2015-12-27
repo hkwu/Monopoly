@@ -79,14 +79,15 @@ class Controller(object):
         self._board = board
         self._view = view
         self._viewNotifications = {
-            'OUT_OF_MOVES': self._view.notifyOutOfMoves,
-            'DICE_ROLL': self._view.notifyDiceRoll,
-            'BUY_OPP': self._view.notifyBuyOpp,
-            'PASS_GO': self._view.notifyPassGo,
-            'TILE_PURCHASE': self._view.notifyTilePurchase,
-            'INSUFFICIENT_FUNDS': self._view.notifyInsufficientFunds,
-            'LIQUIDATE': self._view.notifyLiquidate,
-            'PLAYER_MOVE': self._view.notifyPlayerMove
+            notification.OUT_OF_MOVES: self._view.notifyOutOfMoves,
+            notification.DICE_ROLL: self._view.notifyDiceRoll,
+            notification.BUY_OPP: self._view.notifyBuyOpp,
+            notification.PASS_GO: self._view.notifyPassGo,
+            notification.TILE_PURCHASE: self._view.notifyTilePurchase,
+            notification.INSUFFICIENT_FUNDS: self._view.notifyInsufficientFunds,
+            notification.LIQUIDATE: self._view.notifyLiquidate,
+            notification.PLAYER_MOVE: self._view.notifyPlayerMove,
+            notification.RENT_PAID: self._view.notifyRentPaid
         }
         self._commands = {
             'roll': Move(self),

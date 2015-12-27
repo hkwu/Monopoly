@@ -68,11 +68,14 @@ class Player(object):
     def payRent(self, player, amount):
         """Pays the required rent to the other player. Sends a notification 
         when the debt is too high."""
-        if self._cash - amount < 0:
+        if player.name == self._name:
+            return
+        elif self._cash - amount < 0:
             self._board.acceptNotification(notification.PNLiquidate(self, self.cash + amount))
         else:
             self._cash -= amount
             player.cash += amount
+            self._board.acceptNotification(notification.PNRentPaid(self, player, amount))
 
     def purchase(self, tile):
         """Purchases the tile given."""
