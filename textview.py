@@ -8,10 +8,18 @@
 import cmd
 
 class PlayerRep(object):
-    def __init__(self, name, piece, pos):
+    def __init__(self, name, piece, pos, cash=1500, properties=None):
         self.name = name
         self.piece = piece
         self.pos = pos
+        self.cash = cash
+        self.properties = properties if properties else []
+
+
+class TileRep(object):
+    def __init__(self, name):
+        self.name = name
+
 
 class InputHandler(cmd.Cmd):
     """Handles the game loop and user input."""
@@ -78,7 +86,54 @@ class InputHandler(cmd.Cmd):
     def do_next(self, arg):
         """End your turn."""
         self.turn = (self.turn + 1) % self.view.numPlayers
-        self.view._controller.resetCommandState()
+        self.view.controller.resetCommandState()
+
+    def do_players(self, arg):
+        """Prints the player data for each player in the game."""
+        for player in self.view.players:
+            print("{} [{}]: located at {}. Money: {}{}.".format(player.name, player.pos,
+                                                                self.view.tiles[player.pos].name,
+                                                                self.view.currency['symbol'],
+                                                                player.cash))
+            if player.properties:
+                print("Properties owned:")
+                for prop in player.properties:
+                    print(prop)
+            else:
+                print("No owned properties.")
+
+    def do_look(self, arg):
+        """Prints tile information for <n> tiles around your player, up to a 
+        maximum of 5 tiles on each side."""
+        try:
+            if not 0 <= int(arg) <= 5:
+                print("Usage: look <n>, 0 <= n <= 5")
+            else:
+                ppos = self.view.players[self.turn].pos
+                if ppos - int(arg) < 0:
+                    sliceHead = (ppos - int(arg)) % self.view.size
+                    for tile in self.view.tiles[sliceHead:self.view.size]:
+                        print(tile.name)
+
+                    sliceTail = ppos + int(arg) + 1
+                    for tile in self.view.tiles[0:sliceTail]:
+                        print(tile.name)
+                elif ppos + int(arg) > self.view.size:
+                    sliceHead = ppos - int(arg)
+                    for tile in self.view.tiles[sliceHead:self.view.size]:
+                        print(tile.name)
+
+                    sliceTail = (ppos + int(arg) + 1) % self.view.size
+                    for tile in self.view.tiles[0:sliceTail]:
+                        print(tile.name)
+                else:
+                    sliceHead = (ppos - int(arg)) % self.view.size
+                    sliceTail = (ppos + int(arg) + 1) % self.view.size
+
+                    for tile in self.view.tiles[sliceHead:sliceTail]:
+                        print(tile.name)
+        except ValueError:
+            print("Usage: look <n>, 0 <= n <= 5")
 
     def do_quit(self, arg):
         """Quit the game."""
@@ -95,6 +150,10 @@ class TextView(object):
         self._players = []
         self._numPlayers = 0
         
+    @property
+    def size(self):
+        return self._size
+
     @property
     def style(self):
         return self._style
@@ -119,11 +178,21 @@ class TextView(object):
     def controller(self):
         return self._controller
 
+    @property
+    def currency(self):
+        return self._currency
+
+    @property
+    def tiles(self):
+        return self._tiles
+
     def register(self, controller):
         """Registers the controller with the view."""
         self._controller = controller
+        self._size = self._controller.querySize()
         self._style = self._controller.queryStyle()
         self._currency = self._controller.queryCurrency()
+        self._tiles = [TileRep(tile['name']) for tile in self._controller.queryTiles()]
 
     def notifyDiceRoll(self, data):
         print("Rolled: ({}, {})".format(data['diceA'], data['diceB']))
@@ -140,7 +209,8 @@ class TextView(object):
         print("{}, you cannot roll anymore.".format(data['player']['name']))
 
     def notifyBuyOpp(self, data):
-        print("This property is unowned! Purchase it?")
+        print("This property is unowned! Purchase it for {}{}?".format(self._currency['symbol'],
+                                                                       data['tile']['value']))
         if self._inputHandler.confirmAction():
             self._controller.playerPurchase(data['player']['name'])
         else:
@@ -149,10 +219,19 @@ class TextView(object):
     def notifyPassGo(self, data):
         print("{} has passed GO! Collected {}200.".format(data['player']['name'],
                                                           self._currency['symbol']))
+        for player in self._players:
+            if player.name == data['player']['name']:
+                player.cash += 200
+                break
 
     def notifyTilePurchase(self, data):
         print("{} has purchased {}. Congratulations!".format(data['player']['name'], 
                                                              data['tile']['name']))
+        for player in self._players:
+            if player.name == data['player']['name']:
+                player.cash -= data['tile']['value']
+                player.properties.append(data['tile']['name'])
+                break
 
     def notifyInsufficientFunds(self, data):
         print("{} has insufficient funds to do this. Short: {}{}.".format(self._currency['symbol'],
@@ -166,11 +245,19 @@ class TextView(object):
 
     def notifyPlayerMove(self, data):
         print("{} has moved to {}.".format(data['player']['name'], data['tile']['name']))
+        for player in self._players:
+            if player.name == data['player']['name']:
+                player.pos = data['player']['pos']
+                break
 
     def notifyRentPaid(self, data):
         print("{} has paid {}{} to {}.".format(data['playerRenter']['name'],
                                                self._currency['symbol'], data['rent'],
                                                data['playerLandlord']['name']))
+        for player in self._players:
+            if player.name == data['player']['name']:
+                player.cash -= data['rent']
+                break
 
     def play(self):
         self._inputHandler.cmdloop()

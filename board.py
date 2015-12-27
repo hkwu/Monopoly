@@ -5,16 +5,18 @@
 # Kelvin Wu
 #################
 
+import copy
+
 import dice
 import notification
-import parse
+import me_parser
 import player
 import tile
 
 class Board(object):
     """Handles state information for the board."""
     def __init__(self, dataFile):
-        dataObject = parse.MonopolyInitParser(self, dataFile)
+        dataObject = me_parser.MonopolyInitParser(self, dataFile)
         dataObject.parse()
         self._subscriber = None
         self._size = 40
@@ -34,8 +36,12 @@ class Board(object):
 
     @property
     def currency(self):
-        # return a copy so Board's data isn't tampered with
-        return self._currency.copy()
+        # return a deep copy so Board's data isn't tampered with
+        return copy.deepcopy(self._currency)
+
+    @property
+    def tiles(self):
+        return [tile.pack() for tile in self._tiles]
 
     def diceA(self):
         """Gets the value of the first die."""

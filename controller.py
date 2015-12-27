@@ -31,7 +31,7 @@ class Move(Command):
 
     def execute(self, player):
         if not self.rollAgain:
-            self.controller.notifyView('OUT_OF_MOVES', {'player': {'name': player}})
+            self.controller.notifyView(notification.OUT_OF_MOVES, {'player': {'name': player}})
             return
 
         self.controller.board.diceRoll()
@@ -39,9 +39,10 @@ class Move(Command):
         isDouble = self.controller.board.diceIsDouble()
 
         if isDouble:
-            self.rollCount += 1
             if self.rollCount == 2:
                 self.rollAgain = False
+
+            self.rollCount += 1
         else:
             self.rollAgain = False
 
@@ -52,7 +53,7 @@ class Move(Command):
             'rollAgain': self.rollAgain
         }
 
-        self.controller.notifyView('DICE_ROLL', data)
+        self.controller.notifyView(notification.DICE_ROLL, data)
         self.controller.board.acceptNotification(notification.CNPlayerMove(player, delta))
 
 
@@ -113,6 +114,10 @@ class Controller(object):
         what kind of notification is being sent."""
         self._viewNotifications[code](data)
 
+    def querySize(self):
+        """Returns the size of the game board."""
+        return self._board.size
+
     def queryStyle(self):
         """Returns the style of the game board."""
         return self._board.style
@@ -120,6 +125,12 @@ class Controller(object):
     def queryCurrency(self):
         """Returns currency data for the current game."""
         return self._board.currency
+
+    def queryTiles(self):
+        """Returns a list of tile data for each tile in the board, structured
+        according to the pack() method of each tile. The tiles are ordered from 
+        least to greatest index."""
+        return self._board.tiles
 
     def playerAdd(self, name, piece):
         """Adds a player to the game."""
