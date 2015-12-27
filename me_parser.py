@@ -34,5 +34,6 @@ class MonopolyInitParser(MonopolyDataParser):
         self.currency = self._file['currency']
 
         for i in self._file['tiles']:
-            self.tiles.append(tile.TileFactory.makeTile(self._board, i['name'], 
-                                                        i['type'], i['data']))
+            self.tiles.append(tile.TileFactory.makeTile(self._board, i['name'],
+                                                        i['index'], i['type'], 
+                                                        i['data']))

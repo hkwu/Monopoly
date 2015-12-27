@@ -17,8 +17,9 @@ class PlayerRep(object):
 
 
 class TileRep(object):
-    def __init__(self, name):
+    def __init__(self, name, pos):
         self.name = name
+        self.pos = pos
 
 
 class InputHandler(cmd.Cmd):
@@ -102,9 +103,28 @@ class InputHandler(cmd.Cmd):
             else:
                 print("No owned properties.")
 
+    def _playerOnTile(self, head, tail):
+        """Slices a portion of the view's list of tiles. Goes through the list
+        and prints the names in a column along with any players that are on
+        those tiles."""
+        for tile in self.view.tiles[head:tail]:
+            present = []
+            for player in self.view.players:
+                if player.pos == tile.pos:
+                    present.append(player.name)
+
+            if present:
+                print("{} <- {}".format(tile.name, ", ".join(present)))
+            else:
+                print(width)
+                print("{}".format(tile.name))
+
     def do_look(self, arg):
         """Prints tile information for <n> tiles around your player, up to a 
-        maximum of 5 tiles on each side."""
+        maximum of 5 tiles on each side. Defaults to 1 if no argument is provided."""
+        if not arg:
+            arg = 1
+
         try:
             if not 0 <= int(arg) <= 5:
                 print("Usage: look <n>, 0 <= n <= 5")
@@ -112,26 +132,18 @@ class InputHandler(cmd.Cmd):
                 ppos = self.view.players[self.turn].pos
                 if ppos - int(arg) < 0:
                     sliceHead = (ppos - int(arg)) % self.view.size
-                    for tile in self.view.tiles[sliceHead:self.view.size]:
-                        print(tile.name)
-
+                    self._playerOnTile(sliceHead, self.view.size)
                     sliceTail = ppos + int(arg) + 1
-                    for tile in self.view.tiles[0:sliceTail]:
-                        print(tile.name)
+                    self._playerOnTile(0, sliceTail)
                 elif ppos + int(arg) > self.view.size:
                     sliceHead = ppos - int(arg)
-                    for tile in self.view.tiles[sliceHead:self.view.size]:
-                        print(tile.name)
-
+                    self._playerOnTile(sliceHead, self.view.size)
                     sliceTail = (ppos + int(arg) + 1) % self.view.size
-                    for tile in self.view.tiles[0:sliceTail]:
-                        print(tile.name)
+                    self._playerOnTile(0, sliceTail)
                 else:
                     sliceHead = (ppos - int(arg)) % self.view.size
                     sliceTail = (ppos + int(arg) + 1) % self.view.size
-
-                    for tile in self.view.tiles[sliceHead:sliceTail]:
-                        print(tile.name)
+                    self._playerOnTile(sliceHead, sliceTail)
         except ValueError:
             print("Usage: look <n>, 0 <= n <= 5")
 
@@ -192,7 +204,7 @@ class TextView(object):
         self._size = self._controller.querySize()
         self._style = self._controller.queryStyle()
         self._currency = self._controller.queryCurrency()
-        self._tiles = [TileRep(tile['name']) for tile in self._controller.queryTiles()]
+        self._tiles = [TileRep(tile['name'], tile['pos']) for tile in self._controller.queryTiles()]
 
     def notifyDiceRoll(self, data):
         print("Rolled: ({}, {})".format(data['diceA'], data['diceB']))

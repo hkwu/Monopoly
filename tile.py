@@ -11,27 +11,32 @@ import notification
 class TileFactory(object):
     """Class that instantiates members of the Tile hierarchy."""
     @staticmethod
-    def makeTile(board, name, tileType, data):
+    def makeTile(board, name, pos, tileType, data):
         if tileType == 'basic':
-            return BasicTile(name, board)
+            return BasicTile(name, board, pos)
         elif tileType == 'property':
-            return Property(name, board, data['cost'], data['rent'])
+            return Property(name, board, pos, data['cost'], data['rent'])
 
 
 class Tile(abc.ABC):
     """Abstract tile class at head of hierarchy."""
-    def __init__(self, name, board):
+    def __init__(self, name, board, pos):
         super().__init__()
         self._name = name
         self._board = board
+        self._pos = pos
 
     @property
     def name(self):
         return self._name
 
+    @property
+    def pos(self):
+        return self._pos
+
     def pack(self):
         """Returns a dictionary containing the state information of the tile."""
-        return {'name': self._name}
+        return {'name': self._name, 'pos': self._pos}
 
     @abc.abstractmethod
     def action(self, player):
@@ -45,8 +50,8 @@ class Tile(abc.ABC):
 
 class BasicTile(Tile):
     """A basic tile that does nothing when the player lands on it."""
-    def __init__(self, name, board):
-        super().__init__(name, board)
+    def __init__(self, name, board, pos):
+        super().__init__(name, board, pos)
 
     def action(self, player):
         pass
@@ -54,8 +59,8 @@ class BasicTile(Tile):
 
 class OwnableTile(Tile):
     """Represents a tile that can be owned by a player."""
-    def __init__(self, name, board, value, owner=None, isOwned=False):
-        super().__init__(name, board)
+    def __init__(self, name, board, pos, value, owner=None, isOwned=False):
+        super().__init__(name, board, pos)
         self._isOwned = isOwned
         self._value = value
         self._owner = owner
@@ -97,8 +102,8 @@ class OwnableTile(Tile):
 
 class Property(OwnableTile):
     """A tile that represents a property that charges rent."""
-    def __init__(self, name, board, value, rent, owner=None, isOwned=False, level=0):
-        super().__init__(name, board, value, owner, isOwned)
+    def __init__(self, name, board, pos, value, rent, owner=None, isOwned=False, level=0):
+        super().__init__(name, board, pos, value, owner, isOwned)
         self._rent = rent
         self._improvementLevel = level
 
@@ -119,8 +124,8 @@ class Property(OwnableTile):
 # TODO
 class Utility(OwnableTile):
     """A tile that charges players according to a random die roll."""
-    def __init__(self, name, board, value, owner=None, isOwned=False):
-        super().__init__(name, board, value, owner, isOwned)
+    def __init__(self, name, board, pos, value, owner=None, isOwned=False):
+        super().__init__(name, board, pos, value, owner, isOwned)
     
     def charge(self, player):
         pass
