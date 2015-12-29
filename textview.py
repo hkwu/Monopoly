@@ -61,14 +61,14 @@ class InputHandler(cmd.Cmd):
             piece = input(self.prompt)
             self.view.playerAdd(PlayerRep(name, piece, 0))
 
-        print("It's {}'s turn.".format(self.view.players[self.turn].name))
+        print("\nIt's {}'s turn.".format(self.view.players[self.turn].name))
 
     def postcmd(self, stop, line):
         if line == 'quit':
             print("Thanks for playing!")
             raise SystemExit
 
-        print("It's {}'s turn.".format(self.view.players[self.turn].name))
+        print("\nIt's {}'s turn.".format(self.view.players[self.turn].name))
 
     def confirmAction(self, prompt="> ", invalid="Try again."):
         """Returns a yes or no answer from the user using given prompt. User
@@ -103,21 +103,29 @@ class InputHandler(cmd.Cmd):
             else:
                 print("No owned properties.")
 
-    def _playerOnTile(self, head, tail):
-        """Slices a portion of the view's list of tiles. Goes through the list
-        and prints the names in a column along with any players that are on
-        those tiles."""
-        for tile in self.view.tiles[head:tail]:
+    def _playerOnTile(self, tiles):
+        """Takes a list of tiles. Goes through the list and prints the tile names 
+        in a column along with any players that are on those tiles."""
+        width = 0
+        for tile in tiles:
+            displayWidth = len(tile.name)
+            if displayWidth > width:
+                width = displayWidth
+
+        print("{:2} {:{}} Players\n"
+              "== {:{}} {}".format("ID", "Location", width + 1, '=' * len("Location"), 
+                                   width + 1, '=' * len("Players")))
+        for tile in tiles:
             present = []
             for player in self.view.players:
                 if player.pos == tile.pos:
                     present.append(player.name)
 
+            msg = "{:02} {:{}}".format(tile.pos, tile.name, width + 1)
             if present:
-                print("{} <- {}".format(tile.name, ", ".join(present)))
+                print(msg, "{}".format(", ".join(present)), sep=" ")
             else:
-                print(width)
-                print("{}".format(tile.name))
+                print(msg)
 
     def do_look(self, arg):
         """Prints tile information for <n> tiles around your player, up to a 
@@ -131,19 +139,17 @@ class InputHandler(cmd.Cmd):
             else:
                 ppos = self.view.players[self.turn].pos
                 if ppos - int(arg) < 0:
-                    sliceHead = (ppos - int(arg)) % self.view.size
-                    self._playerOnTile(sliceHead, self.view.size)
-                    sliceTail = ppos + int(arg) + 1
-                    self._playerOnTile(0, sliceTail)
-                elif ppos + int(arg) > self.view.size:
-                    sliceHead = ppos - int(arg)
-                    self._playerOnTile(sliceHead, self.view.size)
-                    sliceTail = (ppos + int(arg) + 1) % self.view.size
-                    self._playerOnTile(0, sliceTail)
+                    listTail = self.view.tiles[0:ppos + int(arg) + 1]
+                    count = int(arg) - ppos
+                    listHead = self.view.tiles[self.view.size - count + 1:self.view.size + 1]
+                    self._playerOnTile(listHead + listTail)
+                elif ppos + int(arg) + 1 > self.view.size:
+                    listHead = self.view.tiles[ppos - int(arg):self.view.size + 1]
+                    count = self.view.size - ppos
+                    listTail = self.view.tiles[0:int(arg) - count + 1]
+                    self._playerOnTile(listHead + listTail)
                 else:
-                    sliceHead = (ppos - int(arg)) % self.view.size
-                    sliceTail = (ppos + int(arg) + 1) % self.view.size
-                    self._playerOnTile(sliceHead, sliceTail)
+                    self._playerOnTile(self.view.tiles[ppos - int(arg):ppos + int(arg) + 1])
         except ValueError:
             print("Usage: look <n>, 0 <= n <= 5")
 
