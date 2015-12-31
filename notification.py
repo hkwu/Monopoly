@@ -54,6 +54,7 @@ class BoardControllerNotification(Notification):
     def visitCT(self, other):
         other.notifyView(self.id, self.data)
 
+
 class TNBuyOpp(BoardRelayNotification):
     """Notification that a player has landed on a purchasable tile."""
     def __init__(self, player, tile):
