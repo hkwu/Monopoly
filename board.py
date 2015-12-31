@@ -44,6 +44,9 @@ class Board(object):
     def tiles(self):
         return [tile.pack() for tile in self._tiles]
 
+    def getTile(self, pos):
+        return self._tiles[pos]
+
     def diceA(self):
         """Gets the value of the first die."""
         return self._dice.a
@@ -86,9 +89,6 @@ class Board(object):
         for i in self._players:
             if i.name == player:
                 i.move(delta)
-                tile = self._tiles[i.pos]
-                self._subscriber.acceptNotification(notification.BNPlayerMove(i, tile))
-                tile.action(i)
                 break
 
     def playerPurchase(self, player):

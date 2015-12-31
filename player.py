@@ -65,6 +65,7 @@ class Player(object):
             self._board.acceptNotification(notification.PNPassGo(self))
 
         self._pos = newPos
+        self._board.acceptNotification(notification.PNPlayerMove(self))
 
     def payRent(self, player, amount):
         """Pays the required rent to the other player. Sends a notification
@@ -72,7 +73,8 @@ class Player(object):
         if player.name == self._name:
             return
         elif self._cash - amount < 0:
-            self._board.acceptNotification(notification.PNLiquidate(self, self.cash + amount))
+            self._board.acceptNotification(notification.PNLiquidate(self, player, 
+                                                                    self.cash + amount))
         else:
             self._cash -= amount
             player.cash += amount

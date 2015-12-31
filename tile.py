@@ -119,7 +119,7 @@ class Property(OwnableTile):
         return data
 
     def charge(self, player):
-        player.payRent(self._owner, self._value)
+        player.payRent(self._owner, self.rent)
 
 
 # TODO

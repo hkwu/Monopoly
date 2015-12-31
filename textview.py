@@ -142,12 +142,12 @@ class InputHandler(cmd.Cmd):
                 if ppos - int(arg) < 0:
                     listTail = self.view.tiles[0:ppos + int(arg) + 1]
                     count = int(arg) - ppos
-                    listHead = self.view.tiles[self.view.size - count + 1:self.view.size + 1]
+                    listHead = self.view.tiles[self.view.size - count:self.view.size]
                     self._playerOnTile(listHead + listTail)
                 elif ppos + int(arg) + 1 > self.view.size:
-                    listHead = self.view.tiles[ppos - int(arg):self.view.size + 1]
-                    count = self.view.size - ppos
-                    listTail = self.view.tiles[0:int(arg) - count + 1]
+                    listHead = self.view.tiles[ppos - int(arg):self.view.size]
+                    count = self.view.size - ppos - 1
+                    listTail = self.view.tiles[0:int(arg) - count]
                     self._playerOnTile(listHead + listTail)
                 else:
                     self._playerOnTile(self.view.tiles[ppos - int(arg):ppos + int(arg) + 1])
@@ -228,7 +228,7 @@ class TextView(object):
         print("{}, you cannot roll anymore.".format(data['player']['name']))
 
     def notifyBuyOpp(self, data):
-        print("This property is unowned! Purchase it for {}{}?".format(self._currency['symbol'],
+        print("\nThis property is unowned! Purchase it for {}{}?".format(self._currency['symbol'],
                                                                        data['tile']['value']))
         if self._inputHandler.confirmAction():
             self._controller.playerPurchase(data['player']['name'])
@@ -274,7 +274,7 @@ class TextView(object):
                                                self._currency['symbol'], data['rent'],
                                                data['playerLandlord']['name']))
         for player in self._players:
-            if player.name == data['player']['name']:
+            if player.name == data['playerRenter']['name']:
                 player.cash -= data['rent']
                 break
 

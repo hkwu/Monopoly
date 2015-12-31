@@ -32,8 +32,8 @@ class Notification(abc.ABC):
         pass
 
 
-class BoardRelayNotification(Notification):
-    """A notification that is relayed to the controller through the Board."""
+class ModelViewNotification(Notification):
+    """A notification that is relayed from the model to the view."""
     def visitBD(self, other):
         other.relayNotification(self)
 
@@ -41,22 +41,13 @@ class BoardRelayNotification(Notification):
         other.notifyView(self.id, self.data)
 
 
-class ControllerBoardNotification(Notification):
-    """A notification sent from the controller to the Board."""
+class ControllerModelNotification(Notification):
+    """A notification sent from the controller to the model."""
     def visitCT(self, other):
         pass
 
 
-class BoardControllerNotification(Notification):
-    """A notification sent from the Board to the controller."""
-    def visitBD(self, other):
-        pass
-
-    def visitCT(self, other):
-        other.notifyView(self.id, self.data)
-
-
-class TNBuyOpp(BoardRelayNotification):
+class TNBuyOpp(ModelViewNotification):
     """Notification that a player has landed on a purchasable tile."""
     def __init__(self, player, tile):
         self.id = BUY_OPP
@@ -66,7 +57,23 @@ class TNBuyOpp(BoardRelayNotification):
         }
 
 
-class PNPassGo(BoardRelayNotification):
+class PNPlayerMove(ModelViewNotification):
+    """Notification that a player has moved to a new location."""
+    def __init__(self, player):
+        self._player = player
+        self.id = PLAYER_MOVE
+        self.data = {
+            'player': player.pack()
+        }
+
+    def visitBD(self, other):
+        tile = other.getTile(self.data['player']['pos'])
+        self.data['tile'] = tile.pack()
+        other.relayNotification(self)
+        tile.action(self._player)
+
+
+class PNPassGo(ModelViewNotification):
     """Notification that a player has passed GO."""
     def __init__(self, player):
         self.id = PASS_GO
@@ -75,7 +82,7 @@ class PNPassGo(BoardRelayNotification):
         }
 
 
-class PNTilePurchase(BoardRelayNotification):
+class PNTilePurchase(ModelViewNotification):
     """Notification that a player has purchased a tile."""
     def __init__(self, player, tile):
         self.id = TILE_PURCHASE
@@ -85,7 +92,7 @@ class PNTilePurchase(BoardRelayNotification):
         }
 
 
-class PNInsufficientFunds(BoardRelayNotification):
+class PNInsufficientFunds(ModelViewNotification):
     """Notification that a player has insufficient funds to complete the
     current action."""
     def __init__(self, player, deficit):
@@ -96,17 +103,18 @@ class PNInsufficientFunds(BoardRelayNotification):
         }
 
 
-class PNLiquidate(BoardRelayNotification):
+class PNLiquidate(ModelViewNotification):
     """Notification that a player must begin liquidating their assets."""
-    def __init__(self, player, required):
+    def __init__(self, player, other, required):
         self.id = LIQUIDATE
         self.data = {
             'player': player.pack(),
+            'other': other.pack(),
             'required': required
         }
 
 
-class PNRentPaid(BoardRelayNotification):
+class PNRentPaid(ModelViewNotification):
     """Notification that a player has paid rent."""
     def __init__(self, playerRenter, playerLandlord, rent):
         self.id = RENT_PAID
@@ -117,7 +125,7 @@ class PNRentPaid(BoardRelayNotification):
         }
 
 
-class CNPlayerMove(ControllerBoardNotification):
+class CNPlayerMove(ControllerModelNotification):
     """Notification that a player is attempting a move."""
     def __init__(self, player, delta):
         self.player = player
@@ -127,20 +135,10 @@ class CNPlayerMove(ControllerBoardNotification):
         other.playerMove(self.player, self.delta)
 
 
-class CNPlayerPurchase(ControllerBoardNotification):
+class CNPlayerPurchase(ControllerModelNotification):
     """Notification that a player is attempting to purchase a property."""
     def __init__(self, player):
         self.player = player
 
     def visitBD(self, other):
         other.playerPurchase(self.player)
-
-
-class BNPlayerMove(BoardControllerNotification):
-    """Notification that player has made a move to a tile."""
-    def __init__(self, player, tile):
-        self.id = PLAYER_MOVE
-        self.data = {
-            'player': player.pack(),
-            'tile': tile.pack()
-        }
