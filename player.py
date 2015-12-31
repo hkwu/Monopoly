@@ -7,6 +7,7 @@
 
 import notification
 
+
 class Player(object):
     """Class to store player state data."""
     def __init__(self, name, piece, pos, board, cash):
@@ -28,7 +29,7 @@ class Player(object):
     @property
     def pos(self):
         return self._pos
-    
+
     @property
     def cash(self):
         return self._cash
@@ -62,11 +63,11 @@ class Player(object):
         # check for Pass GO condition
         if delta > 0 and newPos < self._pos:
             self._board.acceptNotification(notification.PNPassGo(self))
-            
+
         self._pos = newPos
 
     def payRent(self, player, amount):
-        """Pays the required rent to the other player. Sends a notification 
+        """Pays the required rent to the other player. Sends a notification
         when the debt is too high."""
         if player.name == self._name:
             return

@@ -7,6 +7,7 @@
 
 import random
 
+
 class Dice(object):
     """An object representing two fair dice."""
     def __init__(self):

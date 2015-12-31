@@ -18,6 +18,7 @@ LIQUIDATE = 'LIQUIDATE'
 PLAYER_MOVE = 'PLAYER_MOVE'
 RENT_PAID = 'RENT_PAID'
 
+
 class Notification(abc.ABC):
     """Abstract notification class."""
     @abc.abstractmethod

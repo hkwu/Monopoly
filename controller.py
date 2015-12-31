@@ -7,6 +7,7 @@
 
 import notification
 
+
 class Command(object):
     """Handles the execution of game commands. Performs basic verification of
     command prerequisites."""
@@ -55,7 +56,6 @@ class Move(Command):
 
         self.controller.notifyView(notification.DICE_ROLL, data)
         self.controller.board.acceptNotification(notification.CNPlayerMove(player, delta))
-
 
     def reset(self):
         self.rollCount = 0
@@ -128,7 +128,7 @@ class Controller(object):
 
     def queryTiles(self):
         """Returns a list of tile data for each tile in the board, structured
-        according to the pack() method of each tile. The tiles are ordered from 
+        according to the pack() method of each tile. The tiles are ordered from
         least to greatest index."""
         return self._board.tiles
 

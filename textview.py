@@ -7,6 +7,7 @@
 
 import cmd
 
+
 class PlayerRep(object):
     def __init__(self, name, piece, pos, cash=1500, properties=None):
         self.name = name

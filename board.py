@@ -13,6 +13,7 @@ import me_parser
 import player
 import tile
 
+
 class Board(object):
     """Handles state information for the board."""
     def __init__(self, dataFile):
@@ -65,7 +66,7 @@ class Board(object):
         self._subscriber = observer
 
     def acceptNotification(self, notification):
-        """Handles a notification object pushed by model components or the 
+        """Handles a notification object pushed by model components or the
         controller."""
         notification.visitBD(self)
 
@@ -75,7 +76,7 @@ class Board(object):
 
     def playerAdd(self, name, piece, pos=0, cash=None):
         """Adds a player to the game."""
-        if cash == None:
+        if cash is None:
             self._players.append(player.Player(name, piece, pos, self, self._currency['defaultAmount']))
         else:
             self._players.append(player.Player(name, piece, pos, self, cash))

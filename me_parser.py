@@ -9,6 +9,7 @@ import abc
 import json
 import tile
 
+
 class MonopolyDataParser(abc.ABC):
     """Abstract class for JSON data parsers."""
     def __init__(self, board, dataFile):

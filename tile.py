@@ -8,6 +8,7 @@
 import abc
 import notification
 
+
 class TileFactory(object):
     """Class that instantiates members of the Tile hierarchy."""
     @staticmethod
@@ -76,7 +77,7 @@ class OwnableTile(Tile):
     @property
     def owner(self):
         return self._owner
-    
+
     @owner.setter
     def owner(self, owner):
         self._owner = owner
@@ -87,7 +88,7 @@ class OwnableTile(Tile):
         data['value'] = self._value
         data['owned'] = self._owner.name if self._owner else None
         return data
-    
+
     def action(self, player):
         if self._owner:
             self.charge(player)
@@ -126,6 +127,6 @@ class Utility(OwnableTile):
     """A tile that charges players according to a random die roll."""
     def __init__(self, name, board, pos, value, owner=None, isOwned=False):
         super().__init__(name, board, pos, value, owner, isOwned)
-    
+
     def charge(self, player):
         pass
