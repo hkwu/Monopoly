@@ -64,6 +64,11 @@ class Board(object):
     def diceIsDouble(self):
         return self._dice.isDouble()
 
+    def getPlayer(self, name):
+        for pl in self._players:
+            if pl.name == name:
+                return pl
+
     def register(self, observer):
         """Registers a subscriber with the board. Replaces existing subscriber."""
         self._subscriber = observer
@@ -86,14 +91,21 @@ class Board(object):
 
     def playerMove(self, player, delta):
         """Moves a player delta spaces."""
-        for i in self._players:
-            if i.name == player:
-                i.move(delta)
-                break
+        player = self.getPlayer(player)
+        if player != None:
+            player.move(delta)
 
     def playerPurchase(self, player):
         """Purchases the tile that player is standing on."""
-        for i in self._players:
-            if i.name == player:
-                i.purchase(self._tiles[i.pos])
-                break
+        player = self.getPlayer(player)
+        if player != None:
+            player.purchase(self._tiles[player.pos])
+
+    def playerMortgage(self, player, tile):
+        """Mortgages the tile for player."""
+        player = self.getPlayer(player)
+        if player != None:
+            for prop in self._tiles:
+                if prop.name == tile:
+                    player.mortgage(prop)
+                    break

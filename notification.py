@@ -17,6 +17,8 @@ INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS'
 LIQUIDATE = 'LIQUIDATE'
 PLAYER_MOVE = 'PLAYER_MOVE'
 RENT_PAID = 'RENT_PAID'
+MORTGAGE = 'MORTGAGE'
+NOT_OWNED = 'NOT_OWNED'
 
 
 class Notification(abc.ABC):
@@ -109,7 +111,7 @@ class PNLiquidate(ModelViewNotification):
         self.id = LIQUIDATE
         self.data = {
             'player': player.pack(),
-            'other': other.pack(),
+            'other': other.pack() if other else {'name': None},
             'required': required
         }
 
@@ -122,6 +124,27 @@ class PNRentPaid(ModelViewNotification):
             'playerRenter': playerRenter.pack(),
             'playerLandlord': playerLandlord.pack(),
             'rent': rent
+        }
+
+
+class PNMortgage(ModelViewNotification):
+    """Notification that a player has mortgaged a property."""
+    def __init__(self, player, tile):
+        self.id = MORTGAGE
+        self.data = {
+            'player': player.pack(),
+            'tile': tile.pack()
+        }
+
+
+class PNNotOwned(ModelViewNotification):
+    """Notification that a player is attempting to perform an action on a tile
+    they do not own."""
+    def __init__(self, player, tile):
+        self.id = NOT_OWNED
+        self.data = {
+            'player': player.pack(),
+            'tile': tile.pack()
         }
 
 
@@ -142,3 +165,13 @@ class CNPlayerPurchase(ControllerModelNotification):
 
     def visitBD(self, other):
         other.playerPurchase(self.player)
+
+
+class CNPlayerMortgage(ControllerModelNotification):
+    """Notification that a player is attempting to mortgage a property."""
+    def __init__(self, player, tile):
+        self.player = player
+        self.tile = tile
+
+    def visitBD(self, other):
+        other.playerMortgage(self.player, self.tile)

@@ -75,6 +75,18 @@ class Purchase(Command):
         pass
 
 
+class Mortgage(Command):
+    """Handles a request to mortgage a property."""
+    def __init__(self, controller):
+        super().__init__(controller)
+
+    def execute(self, player, tile):
+        self.controller.board.acceptNotification(notification.CNPlayerMortgage(player, tile))
+
+    def reset(self):
+        pass
+
+
 class Controller(object):
     def __init__(self, board, view):
         self._board = board
@@ -88,7 +100,9 @@ class Controller(object):
             notification.INSUFFICIENT_FUNDS: self._view.notifyInsufficientFunds,
             notification.LIQUIDATE: self._view.notifyLiquidate,
             notification.PLAYER_MOVE: self._view.notifyPlayerMove,
-            notification.RENT_PAID: self._view.notifyRentPaid
+            notification.RENT_PAID: self._view.notifyRentPaid,
+            notification.MORTGAGE: self._view.notifyMortgage,
+            notification.NOT_OWNED: self._view.notifyNotOwned
         }
         self._commands = {
             'roll': Move(self),
@@ -143,6 +157,10 @@ class Controller(object):
     def playerPurchase(self, player):
         """Executes command: purchases tile that player is located at."""
         self._commands['purchase'].execute(player)
+
+    def playerMortgage(self, player, tile):
+        """Executes command: mortgages tile given."""
+        self._commands['mortgage'].execute(player, tile)
 
     def resetCommandState(self):
         """Resets state of all commands."""

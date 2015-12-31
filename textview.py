@@ -18,9 +18,14 @@ class PlayerRep(object):
 
 
 class TileRep(object):
-    def __init__(self, name, pos):
+    def __init__(self, name, pos, value, owner=None, isOwned=False, 
+                 mortgaged=False):
         self.name = name
         self.pos = pos
+        self.value = value
+        self.owner = owner
+        self.isOwned = isOwned
+        self.mortgaged = mortgaged
 
 
 class InputHandler(cmd.Cmd):
@@ -68,18 +73,11 @@ class InputHandler(cmd.Cmd):
         if line == 'quit':
             print("Thanks for playing!")
             raise SystemExit
+        elif self.view.numPlayers < 2:
+            print("{} is the winner! Thanks for playing!".format(self.view.players[0]))
+            raise SystemExit
 
         print("\nIt's {}'s turn.".format(self.view.players[self.turn].name))
-
-    def confirmAction(self, prompt="> ", invalid="Try again."):
-        """Returns a yes or no answer from the user using given prompt. User
-        is prompted using the given invalid argument if answer is not yes/no."""
-        action = input(prompt)
-        while action.lower() not in ['y', 'yes', 'n', 'no']:
-            print(invalid)
-            action = input(prompt)
-
-        return True if action in ['y', 'yes'] else False
 
     def do_roll(self, arg):
         """Roll the dice and move your player piece."""
@@ -144,6 +142,7 @@ class InputHandler(cmd.Cmd):
                     count = int(arg) - ppos
                     listHead = self.view.tiles[self.view.size - count:self.view.size]
                     self._playerOnTile(listHead + listTail)
+                    self.do_next('')
                 elif ppos + int(arg) + 1 > self.view.size:
                     listHead = self.view.tiles[ppos - int(arg):self.view.size]
                     count = self.view.size - ppos - 1
@@ -160,6 +159,50 @@ class InputHandler(cmd.Cmd):
 
     def default(self, arg):
         print("Unknown or invalid command: {}.".format(arg))
+
+    def confirmAction(self, prompt="> ", invalid="Try again."):
+        """Returns a yes or no answer from the user using given prompt. User
+        is prompted using the given invalid argument if answer is not yes/no."""
+        action = input(prompt)
+        while action.lower() not in ['y', 'yes', 'n', 'no']:
+            print(invalid)
+            action = input(prompt)
+
+        return True if action in ['y', 'yes'] else False
+
+    def liquidateAssets(self, player, other, amount):
+        """Prompts player to liquidate his assets until given cash amount is
+        reached."""
+        print("{}'s Properties\n"
+              '=' * (len(player) + 13))
+
+        player = self.view.getPlayer(player)
+        for tile in player.properties:
+            print(tile.name)
+
+        while player.cash < amount:
+            print("Amount needed: {}{}".format(self.view.currency['symbol'],
+                                               amount - player.cash))
+            if not player.properties:
+                print("Looks like you're out of properties to mortgage. Bankrupt!")
+                self.view.controller.notifyPlayerBankrupt(player.name, other)
+                self.view.playerBankrupt(player.name, other)
+            else:
+                print("\nEnter the names of properties you wish to mortgage.\n"
+                      "Type DONE when you're done.")
+                mortgageList = []
+                prop = input(prompt)
+
+                while prop != 'DONE':
+                    mortgageList.append(prop)
+                    prop = input(prompt)
+
+                for tile in mortgageList:
+                    self.view.controller.playerMortgage(player.name, tile)
+
+                print("You now have {}{}.".format(self.view.currency['symbol'],
+                                                  player.cash))
+
 
 class TextView(object):
     """Basic text view."""
@@ -180,6 +223,11 @@ class TextView(object):
     @property
     def players(self):
         return self._players
+
+    def getPlayer(self, player):
+        for pl in self._players:
+            if pl.name == player:
+                return pl
 
     def playerAdd(self, player):
         self._players.append(player)
@@ -211,7 +259,12 @@ class TextView(object):
         self._size = self._controller.querySize()
         self._style = self._controller.queryStyle()
         self._currency = self._controller.queryCurrency()
-        self._tiles = [TileRep(tile['name'], tile['pos']) for tile in self._controller.queryTiles()]
+        self._tiles = [TileRep(tile['name'], tile['pos'], 
+                               tile['value'] if 'value' in tile else None,
+                               tile['owner'] if 'owner' in tile else None,
+                               tile['isOwned'] if 'isOwned' in tile else False,
+                               tile['mortgaged'] if 'mortgaged' in tile else False) 
+                       for tile in self._controller.queryTiles()]
 
     def notifyDiceRoll(self, data):
         print("Rolled: ({}, {})".format(data['diceA'], data['diceB']))
@@ -250,6 +303,13 @@ class TextView(object):
             if player.name == data['player']['name']:
                 player.cash -= data['tile']['value']
                 player.properties.append(data['tile']['name'])
+
+                for tile in self._tiles:
+                    if tile.name == data['tile']['name']:
+                        tile.owner = player
+                        tile.isOwned = True
+                        break
+
                 break
 
     def notifyInsufficientFunds(self, data):
@@ -261,6 +321,8 @@ class TextView(object):
         print("{} must sell assets until they obtain {}{}.".format(self._currency['symbol'],
                                                                    data['player']['name'], 
                                                                    data['required']))
+        self._inputHandler.liquidateAssets(data['player']['name'], data['other']['name'], 
+                                           data['required'])
 
     def notifyPlayerMove(self, data):
         print("{} has moved to {}.".format(data['player']['name'], data['tile']['name']))
@@ -277,6 +339,36 @@ class TextView(object):
             if player.name == data['playerRenter']['name']:
                 player.cash -= data['rent']
                 break
+
+    def notifyMortgage(self, data):
+        print("{} has mortgaged {} for {}{}.".format(data['player']['name'],
+                                                     data['tile']['name'],
+                                                     self._currency['symbol'],
+                                                     data['tile']['value'] / 2))
+        for player in self._players:
+            if player.name == data['player']['name']:
+                player.cash += data['tile']['value'] / 2
+                for tile in player.properties:
+                    if tile.name == data['tile']['name']:
+                        tile.mortgaged = True
+                        break
+
+                break
+
+    def notifyNotOwned(self, data):
+        print("{}, you do not own {}.".format(data['player']['name'],
+                                              data['tile']['name']))
+
+    def playerBankrupt(self, player, other):
+        """Takes a player out of the game. Hands over assets to other."""
+        self._players.remove(self.getPlayer(player))
+        self._numPlayers -= 1
+
+        for tile in self._tiles:
+            if tile.owner == player:
+                tile.owner = other
+
+        print("{} has left the game.".format(player))
 
     def play(self):
         self._inputHandler.cmdloop()

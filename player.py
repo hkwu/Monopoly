@@ -88,3 +88,11 @@ class Player(object):
             self._board.acceptNotification(notification.PNTilePurchase(self, tile))
         else:
             self._board.acceptNotification(notification.PNInsufficientFunds(self, tile.value - self._cash))
+
+    def mortgage(self, tile):
+        """Mortgages the tile."""
+        if tile.owner and tile.owner.name == self._name:
+            tile.mortgage()
+            self._board.acceptNotification(notification.PNMortgage(self, tile))
+        else:
+            self._board.acceptNotification(notification.PNNotOwned(self, tile))
