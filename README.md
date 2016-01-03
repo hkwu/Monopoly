@@ -9,7 +9,7 @@ This is a list of features that are currently available.
 * Paying rent
 
 ## Views
-By decoupling the view from the model, it is possible to implement different views without modifying the engine. View implementations are stored in `monopoly/view`.
+By decoupling the player interface from the model, it is possible to implement different views without modifying the engine. View implementations are stored in `monopoly/view`.
 * Minimal Textview
 
 ## Skins
