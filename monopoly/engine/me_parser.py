@@ -7,7 +7,8 @@
 
 import abc
 import json
-import tile
+
+from . import tile
 
 
 class MonopolyDataParser(abc.ABC):

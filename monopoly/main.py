@@ -6,12 +6,12 @@
 # Kelvin Wu
 ############
 
-import board
-import controller
-import textview
+from engine import board
+from engine import controller
+from view import textview
 
 if __name__ == '__main__':
-    gameBoard = board.Board('standard.json')
+    gameBoard = board.Board('skin/standard.json')
     gameView = textview.TextView()
     gameController = controller.Controller(gameBoard, gameView)
     gameView.register(gameController)

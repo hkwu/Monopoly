@@ -7,11 +7,11 @@
 
 import copy
 
-import dice
-import notification
-import me_parser
-import player
-import tile
+from . import dice
+from . import notification
+from . import me_parser
+from . import player
+from . import tile
 
 
 class Board(object):

@@ -6,7 +6,8 @@
 #################
 
 import abc
-import notification
+
+from . import notification
 
 
 class TileFactory(object):

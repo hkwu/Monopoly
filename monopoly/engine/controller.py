@@ -5,7 +5,7 @@
 # Kelvin Wu
 #################
 
-import notification
+from . import notification
 
 
 class Command(object):
