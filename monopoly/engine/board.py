@@ -16,8 +16,8 @@ from . import tile
 
 class Board(object):
     """Handles state information for the board."""
-    def __init__(self, dataFile):
-        dataObject = me_parser.MonopolyInitParser(self, dataFile)
+    def __init__(self, skin):
+        dataObject = me_parser.MonopolyInitParser(self, skin)
         dataObject.parse()
         self._subscriber = None
         self._size = 40

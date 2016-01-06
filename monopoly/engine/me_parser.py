@@ -13,9 +13,9 @@ from . import tile
 
 class MonopolyDataParser(abc.ABC):
     """Abstract class for JSON data parsers."""
-    def __init__(self, board, dataFile):
+    def __init__(self, board, skin):
         self._board = board
-        with open(dataFile) as data:
+        with open(skin) as data:
             self._file = json.load(data)
 
     @abc.abstractmethod
@@ -27,8 +27,8 @@ class MonopolyDataParser(abc.ABC):
 
 class MonopolyInitParser(MonopolyDataParser):
     """Parses JSON file that contains tile initialization data."""
-    def __init__(self, board, dataFile):
-        super().__init__(board, dataFile)
+    def __init__(self, board, skin):
+        super().__init__(board, skin)
         self.tiles = []
 
     def parse(self):
