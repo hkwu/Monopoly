@@ -62,6 +62,7 @@ class Player(object):
         newPos = (self._pos + delta) % self._board.size
         # check for Pass GO condition
         if delta > 0 and newPos < self._pos:
+            self._cash += 200
             self._board.acceptNotification(notification.PNPassGo(self))
 
         self._pos = newPos
@@ -73,8 +74,7 @@ class Player(object):
         if player.name == self._name:
             return
         elif self._cash - amount < 0:
-            self._board.acceptNotification(notification.PNLiquidate(self, player, 
-                                                                    self.cash + amount))
+            self._board.acceptNotification(notification.PNLiquidate(self, player, amount))
         else:
             self._cash -= amount
             player.cash += amount

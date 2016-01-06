@@ -109,3 +109,13 @@ class Board(object):
                 if prop.name == tile:
                     player.mortgage(prop)
                     break
+
+    def playerBankrupt(self, player, other):
+        """Removes a player from the game."""
+        player = self.getPlayer(player)
+        other = self.getPlayer(other)
+
+        for tile in player.properties:
+            tile.owner = other
+
+        self._players.remove(player)

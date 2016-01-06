@@ -162,7 +162,23 @@ class Controller(object):
         """Executes command: mortgages tile given."""
         self._commands['mortgage'].execute(player, tile)
 
+    def playerBankrupt(self, player, other):
+        """Removes a player from the game."""
+        self._board.playerBankrupt(player, other)
+
     def resetCommandState(self):
         """Resets state of all commands."""
         for cmd in self._commands:
             self._commands[cmd].reset()
+
+    # DEBUG
+    def playerMoveP(self, player, num):
+        data = {
+            'diceA': num / 2,
+            'diceB': num / 2,
+            'isDouble': False,
+            'rollAgain': False
+        }
+
+        self.notifyView(notification.DICE_ROLL, data)
+        self._board.acceptNotification(notification.CNPlayerMove(player, num))

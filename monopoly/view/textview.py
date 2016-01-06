@@ -9,7 +9,7 @@ import cmd
 
 
 class PlayerRep(object):
-    def __init__(self, name, piece, pos, cash=1500, properties=None):
+    def __init__(self, name, piece, pos, cash, properties=None):
         self.name = name
         self.piece = piece
         self.pos = pos
@@ -65,7 +65,7 @@ class InputHandler(cmd.Cmd):
             name = input(self.prompt)
             print("What piece will you use?")
             piece = input(self.prompt)
-            self.view.playerAdd(PlayerRep(name, piece, 0))
+            self.view.playerAdd(PlayerRep(name, piece, 0, self.view.currency['defaultAmount']))
 
         print("\nIt's {}'s turn.".format(self.view.players[self.turn].name))
 
@@ -74,7 +74,7 @@ class InputHandler(cmd.Cmd):
             print("Thanks for playing!")
             raise SystemExit
         elif self.view.numPlayers < 2:
-            print("{} is the winner! Thanks for playing!".format(self.view.players[0]))
+            print("{} is the winner! Thanks for playing!".format(self.view.players[0].name))
             raise SystemExit
 
         print("\nIt's {}'s turn.".format(self.view.players[self.turn].name))
@@ -82,6 +82,9 @@ class InputHandler(cmd.Cmd):
     def do_roll(self, arg):
         """Roll the dice and move your player piece."""
         self.view.controller.playerMove(self.view.players[self.turn].name)
+
+    def do_rollp(self, arg):
+        self.view.controller.playerMoveP(self.view.players[self.turn].name, int(arg))
 
     def do_next(self, arg):
         """End your turn."""
@@ -142,7 +145,6 @@ class InputHandler(cmd.Cmd):
                     count = int(arg) - ppos
                     listHead = self.view.tiles[self.view.size - count:self.view.size]
                     self._playerOnTile(listHead + listTail)
-                    self.do_next('')
                 elif ppos + int(arg) + 1 > self.view.size:
                     listHead = self.view.tiles[ppos - int(arg):self.view.size]
                     count = self.view.size - ppos - 1
@@ -173,20 +175,20 @@ class InputHandler(cmd.Cmd):
     def liquidateAssets(self, player, other, amount):
         """Prompts player to liquidate his assets until given cash amount is
         reached."""
-        print("{}'s Properties\n"
-              '=' * (len(player) + 13))
+        print("{}'s Properties".format(player))
+        print('=' * (len(player) + 13))
 
         player = self.view.getPlayer(player)
         for tile in player.properties:
-            print(tile.name)
+            print(tile)
 
         while player.cash < amount:
             print("Amount needed: {}{}".format(self.view.currency['symbol'],
                                                amount - player.cash))
             if not player.properties:
                 print("Looks like you're out of properties to mortgage. Bankrupt!")
-                self.view.controller.notifyPlayerBankrupt(player.name, other)
                 self.view.playerBankrupt(player.name, other)
+                break
             else:
                 print("\nEnter the names of properties you wish to mortgage.\n"
                       "Type DONE when you're done.")
@@ -313,14 +315,14 @@ class TextView(object):
                 break
 
     def notifyInsufficientFunds(self, data):
-        print("{} has insufficient funds to do this. Short: {}{}.".format(self._currency['symbol'],
-                                                                          data['player']['name'], 
+        print("{} has insufficient funds to do this. Short: {}{}.".format(data['player']['name'],
+                                                                          self._currency['symbol'],
                                                                           data['deficit']))
 
     def notifyLiquidate(self, data):
-        print("{} must sell assets until they obtain {}{}.".format(self._currency['symbol'],
-                                                                   data['player']['name'], 
-                                                                   data['required']))
+        print("{} must sell assets until they hold {}{}.".format(data['player']['name'],
+                                                                 self._currency['symbol'],
+                                                                 data['required']))
         self._inputHandler.liquidateAssets(data['player']['name'], data['other']['name'], 
                                            data['required'])
 
@@ -361,6 +363,7 @@ class TextView(object):
 
     def playerBankrupt(self, player, other):
         """Takes a player out of the game. Hands over assets to other."""
+        self._controller.playerBankrupt(player, other)
         self._players.remove(self.getPlayer(player))
         self._numPlayers -= 1
 
