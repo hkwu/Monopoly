@@ -10,7 +10,7 @@ This project was implemented and tested using Python 3. Backwards compatibility 
 
 ### Options
 The following command-line options are supported:
-* `[--skin SKIN]` Specify the board's appearance. Given value must be the name of a JSON file located in `monopoly/skin`. Provide only the name of the file.
+* `--skin SKIN` Specify the board's appearance. Given value must be the name of a JSON file located in `monopoly/skin`. Provide only the name of the file.
 
 ## Project Overview
 ### Implemented Features
