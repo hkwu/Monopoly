@@ -35,7 +35,7 @@ All `Notification` objects overwrite two base abstract methods to implement the 
 
 ### `TNBuyOpp`
 ````
-data = {
+{
     'player': player.pack(),
     'tile': tile.pack()
 }
@@ -43,7 +43,7 @@ data = {
 
 ### `PNRentPaid`
 ````
-data = {
+{
     'playerA': playerA.pack(),
     'playerB': playerB.pack(),
     'rent': rent
