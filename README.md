@@ -9,7 +9,7 @@ To start a game, navigate to the `monopoly` folder and run `main.py` through you
 This project was implemented and tested using Python 3. Backwards compatibility with Python 2 is not guaranteed.
 
 ### Options
-The following command-line options are supported:
+The following command line options are supported:
 * `--skin=SKIN` Specify the board's appearance. Given value must be the name of a JSON file located in `monopoly/skin`. Provide only the name of the file.
 
 ## Project Overview
