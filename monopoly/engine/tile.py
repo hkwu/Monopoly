@@ -89,8 +89,7 @@ class OwnableTile(Tile):
         data = super().pack()
         data['isOwned'] = self._isOwned
         data['value'] = self._value
-        data['owned'] = self._owner.name if self._owner else None
-        data['isOwned'] = self._isOwned
+        data['owner'] = self._owner.name if self._owner else None
         data['mortgaged'] = self._mortgaged
         return data
 
