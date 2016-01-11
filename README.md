@@ -1,5 +1,5 @@
 # Monopoly
-A project based on a class assignment. The goal is to implement the logic of Monopoly using the MVC pattern.
+A project based on a class assignment originally done in C++. The goal is to implement the logic of Monopoly using the MVC pattern.
 
 ## Quick Start
 To start a game, navigate to the `monopoly` folder and run `main.py` through your command line, using one of the following commands:
