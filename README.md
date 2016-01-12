@@ -34,7 +34,7 @@ The Monopoly engine implements its own `Notification` class to handle communicat
 All `Notification` objects overwrite two base abstract methods to implement the Visitor Pattern: one to visit the `Board` and another to visit the `Controller`. The structure of the data passed by certain `Notification` objects is illustrated below.
 
 ### `TNBuyOpp`
-````
+````py
 {
     'player': player.pack(),
     'tile': tile.pack()
@@ -42,7 +42,7 @@ All `Notification` objects overwrite two base abstract methods to implement the 
 ````
 
 ### `PNRentPaid`
-````
+````py
 {
     'playerA': playerA.pack(),
     'playerB': playerB.pack(),
@@ -52,7 +52,7 @@ All `Notification` objects overwrite two base abstract methods to implement the 
 
 In the above code segments, `player.pack()` and `tile.pack()` represent a dictionary returned by the `pack()` method of each respective object. For instance, the `Tile` class's `pack()` method returns a dictionary containing state data for a `Tile` object:
 
-````
+````py
 {
     'name': 'Water Works',
     'pos': 28,
