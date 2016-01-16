@@ -10,8 +10,9 @@ This project was implemented and tested using Python 3. Backwards compatibility 
 
 ### Options
 The following command line options are supported:
-* `--skin` Specify the board's appearance. Given value must be the name of a JSON file located in `monopoly/skin`. Provide only the name of the file.
-* `--view` Specify a view to use. Given value must be the name of a valid Python module containing a class named `View`. This class must inherit from the `MonopolyView` class found in `view.view`.
+* `--skin`. Specify the board's appearance. Given value must be the name of a JSON file located in `monopoly/skin`. Provide only the name of the file.
+* `--view`. Specify a view to use. Given value must be the name of a valid Python module containing a class named `View`. This class must inherit from the `MonopolyView` class found in `view.view`.
+* `-d`, `--debug`. Turn on debug mode.
 
 ## Project Overview
 ### Implemented Features
@@ -41,16 +42,14 @@ The Monopoly engine implements its own `Notification` class to handle communicat
 
 All `Notification` objects overwrite two base abstract methods to implement the Visitor Pattern: one to visit the `Board` and another to visit the `Controller`. The structure of the data passed by certain `Notification` objects is illustrated below.
 
-### `TNBuyOpp`
 ````py
+# TNBuyOpp
 {
     'player': player.pack(),
     'tile': tile.pack()
 }
-````
 
-### `PNRentPaid`
-````py
+# PNRentPaid
 {
     'playerA': playerA.pack(),
     'playerB': playerB.pack(),
