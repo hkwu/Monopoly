@@ -85,8 +85,9 @@ class InputHandler(cmd.Cmd):
         """Roll the dice and move your player piece."""
         self.view.controller.playerMove(self.view.players[self.turn].name)
 
-    def do_rollp(self, arg):
-        self.view.controller.playerMoveP(self.view.players[self.turn].name, int(arg))
+    def do_rolld(self, arg):
+        if arg:
+            self.view.controller.playerMoveDebug(self.view.players[self.turn].name, int(arg))
 
     def do_next(self, arg):
         """End your turn."""

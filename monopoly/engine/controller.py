@@ -88,9 +88,10 @@ class Mortgage(Command):
 
 
 class Controller(object):
-    def __init__(self, board, view):
+    def __init__(self, board, view, debug):
         self._board = board
         self._view = view
+        self._debug = debug
         self._viewNotifications = {
             notification.OUT_OF_MOVES: self._view.notifyOutOfMoves,
             notification.DICE_ROLL: self._view.notifyDiceRoll,
@@ -172,13 +173,14 @@ class Controller(object):
             self._commands[cmd].reset()
 
     # DEBUG
-    def playerMoveP(self, player, num):
-        data = {
-            'diceA': num / 2,
-            'diceB': num / 2,
-            'isDouble': False,
-            'rollAgain': False
-        }
+    def playerMoveDebug(self, player, num):
+        if self._debug:
+            data = {
+                'diceA': num / 2,
+                'diceB': num / 2,
+                'isDouble': False,
+                'rollAgain': False
+            }
 
-        self.notifyView(notification.DICE_ROLL, data)
-        self._board.acceptNotification(notification.CNPlayerMove(player, num))
+            self.notifyView(notification.DICE_ROLL, data)
+            self._board.acceptNotification(notification.CNPlayerMove(player, num))

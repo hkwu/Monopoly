@@ -16,11 +16,12 @@ VIEWS = {'textview_min'}
 
 if __name__ == '__main__':
     mparser = argparse.ArgumentParser()
-    mparser.add_argument("--skin", help=("provide the name of a JSON file to "
+    mparser.add_argument('--skin', help=("provide the name of a JSON file to "
                                          "customize the board's theme"),
                          default='standard')
-    mparser.add_argument("--view", help="enter the name of a view module to use",
+    mparser.add_argument('--view', help="enter the name of a view module to use",
                          default='textview_min')
+    mparser.add_argument('-d', '--debug', help="enter debug mode", action='store_true')
     args = mparser.parse_args()
 
     # initialize gameBoard
@@ -35,7 +36,7 @@ if __name__ == '__main__':
     if args.view in VIEWS:
         view = importlib.import_module('view.' + args.view)
         gameView = view.View()
-        gameController = controller.Controller(gameBoard, gameView)
+        gameController = controller.Controller(gameBoard, gameView, args.debug)
         gameView.registerController(gameController)
         gameView.play()
     else:
