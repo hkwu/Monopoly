@@ -7,6 +7,8 @@
 
 import cmd
 
+from . import view
+
 
 class PlayerRep(object):
     def __init__(self, name, piece, pos, cash, properties=None):
@@ -18,7 +20,7 @@ class PlayerRep(object):
 
 
 class TileRep(object):
-    def __init__(self, name, pos, value, owner=None, isOwned=False, 
+    def __init__(self, name, pos, value, owner=None, isOwned=False,
                  mortgaged=False):
         self.name = name
         self.pos = pos
@@ -51,7 +53,7 @@ class InputHandler(cmd.Cmd):
                 num = int(num)
                 if num <= 1:
                     raise ValueError
-                
+
                 self.view.numPlayers = num
             except ValueError:
                 print("Try again.")
@@ -115,7 +117,7 @@ class InputHandler(cmd.Cmd):
                 width = displayWidth
 
         print("{:2} {:{}} Players\n"
-              "== {:{}} {}".format("ID", "Location", width + 1, '=' * len("Location"), 
+              "== {:{}} {}".format("ID", "Location", width + 1, '=' * len("Location"),
                                    width + 1, '=' * len("Players")))
         for tile in tiles:
             present = []
@@ -206,14 +208,14 @@ class InputHandler(cmd.Cmd):
                                                   player.cash))
 
 
-class TextView(object):
+class TextView(view.MonopolyView):
     """Basic text view."""
     def __init__(self):
-        self._controller = None
+        super().__init__()
         self._inputHandler = InputHandler(self)
         self._players = []
         self._numPlayers = 0
-        
+ 
     @property
     def size(self):
         return self._size
@@ -221,7 +223,7 @@ class TextView(object):
     @property
     def style(self):
         return self._style
-    
+
     @property
     def players(self):
         return self._players
@@ -234,11 +236,11 @@ class TextView(object):
     def playerAdd(self, player):
         self._players.append(player)
         self._controller.playerAdd(player.name, player.piece)
-    
+
     @property
     def numPlayers(self):
         return self._numPlayers
-    
+
     @numPlayers.setter
     def numPlayers(self, numPlayers):
         self._numPlayers = numPlayers
@@ -257,7 +259,7 @@ class TextView(object):
 
     def register(self, controller):
         """Registers the controller with the view."""
-        self._controller = controller
+        super().registerController(controller)
         self._size = self._controller.querySize()
         self._style = self._controller.queryStyle()
         self._currency = self._controller.queryCurrency()
@@ -265,7 +267,7 @@ class TextView(object):
                                tile['value'] if 'value' in tile else None,
                                tile['owner'] if 'owner' in tile else None,
                                tile['isOwned'] if 'isOwned' in tile else False,
-                               tile['mortgaged'] if 'mortgaged' in tile else False) 
+                               tile['mortgaged'] if 'mortgaged' in tile else False)
                        for tile in self._controller.queryTiles()]
 
     def notifyDiceRoll(self, data):
@@ -299,7 +301,7 @@ class TextView(object):
                 break
 
     def notifyTilePurchase(self, data):
-        print("{} has purchased {}. Congratulations!".format(data['player']['name'], 
+        print("{} has purchased {}. Congratulations!".format(data['player']['name'],
                                                              data['tile']['name']))
         for player in self._players:
             if player.name == data['player']['name']:
@@ -323,7 +325,7 @@ class TextView(object):
         print("{} must sell assets until they hold {}{}.".format(data['player']['name'],
                                                                  self._currency['symbol'],
                                                                  data['required']))
-        self._inputHandler.liquidateAssets(data['player']['name'], data['other']['name'], 
+        self._inputHandler.liquidateAssets(data['player']['name'], data['other']['name'],
                                            data['required'])
 
     def notifyPlayerMove(self, data):
