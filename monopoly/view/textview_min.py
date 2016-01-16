@@ -208,7 +208,7 @@ class InputHandler(cmd.Cmd):
                                                   player.cash))
 
 
-class TextView(view.MonopolyView):
+class View(view.MonopolyView):
     """Basic text view."""
     def __init__(self):
         super().__init__()
@@ -257,7 +257,7 @@ class TextView(view.MonopolyView):
     def tiles(self):
         return self._tiles
 
-    def register(self, controller):
+    def registerController(self, controller):
         """Registers the controller with the view."""
         super().registerController(controller)
         self._size = self._controller.querySize()

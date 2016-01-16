@@ -7,21 +7,36 @@
 ############
 
 import argparse
+import importlib
 
 from engine import board
 from engine import controller
-from view import textview
+
+VIEWS = {'textview_min'}
 
 if __name__ == '__main__':
     mparser = argparse.ArgumentParser()
     mparser.add_argument("--skin", help=("provide the name of a JSON file to "
                                          "customize the board's theme"),
                          default='standard')
+    mparser.add_argument("--view", help="enter the name of a view module to use",
+                         default='textview_min')
     args = mparser.parse_args()
 
-    # exception is thrown if file doesn't exist
-    gameBoard = board.Board('skin/' + args.skin + '.json')
-    gameView = textview.TextView()
-    gameController = controller.Controller(gameBoard, gameView)
-    gameView.register(gameController)
-    gameView.play()
+    # initialize gameBoard
+    gameBoard = None
+    try:
+        gameBoard = board.Board('skin/' + args.skin + '.json')
+    except:
+        print("Invalid JSON file: " + args.skin)
+        raise SystemExit
+
+    # import appropriate view
+    if args.view in VIEWS:
+        view = importlib.import_module('view.' + args.view)
+        gameView = view.View()
+        gameController = controller.Controller(gameBoard, gameView)
+        gameView.registerController(gameController)
+        gameView.play()
+    else:
+        print("Unable to locate view: " + args.view)
