@@ -10,7 +10,8 @@ This project was implemented and tested using Python 3. Backwards compatibility 
 
 ### Options
 The following command line options are supported:
-* `--skin=SKIN` Specify the board's appearance. Given value must be the name of a JSON file located in `monopoly/skin`. Provide only the name of the file.
+* `--skin` Specify the board's appearance. Given value must be the name of a JSON file located in `monopoly/skin`. Provide only the name of the file.
+* `--view` Specify a view to use. Given value must be the name of a valid Python module containing a class named `View`. This class must inherit from the `MonopolyView` class found in `view.view`.
 
 ## Project Overview
 ### Implemented Features
@@ -22,11 +23,18 @@ This is a list of features that are currently available.
 
 ### Views
 By decoupling the player interface from the model, it is possible to implement different views without modifying the engine. View implementations are stored in `monopoly/view`.
-* Minimal Textview
+
+| Module | Name | Description |
+| :----- | :--- | :---------- |
+| `textview_min` | Minimal Textview | Barebones view implementation meant for quick games. Provides a command line interface and a rudimentary way to see around the board. |
 
 ### Skins
 The look and feel of the game board can be modified through the use of different JSON files stored in `monopoly/skin`. This provides an additional degree of customization to the player.
-* US Standard Edition (2008)
+
+| File | Name | Description |
+| :--- | :--- | :---------- |
+| `standard.json` | US Standard Edition (2008) | The Monopoly board as featured in the current iteration of the game produced by Hasbro. |
+| `uwaterloo.json` | University of Waterloo Edition | Based on the board used in the C++ implementation of this game. Features buildings taken from the University of Waterloo's main campus. |
 
 ## Notification Model
 The Monopoly engine implements its own `Notification` class to handle communications between each of the application components. In particular, each `Notification` object can store a package of data in one of its fields. Each package of data is constructed using methods attached to certain Model classes such as `Tile` and `Player`.
